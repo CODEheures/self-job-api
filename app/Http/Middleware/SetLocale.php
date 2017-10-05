@@ -15,8 +15,8 @@ class SetLocale
      */
     public function handle($request, Closure $next, $guard = null)
     {
-        if($request->filled('langage') && in_array($request->langage, config('app.availableLocales')) ){
-            App::setLocale($request->langage);
+        if($request->filled('language') && in_array($request->langage, config('app.availableLocales')) ){
+            App::setLocale($request->language);
         }
 
         return $next($request);

@@ -12,7 +12,7 @@ class UserController extends Controller
 
 
     public function getUser() {
-        $user = Auth::user()->only(['name', 'email']);
+        $user = Auth::user()->only(['name', 'email', 'pref_language']);
         return response()->json($user);
     }
 
@@ -24,4 +24,18 @@ class UserController extends Controller
 
         return response()->json($exist);
     }
+
+    public function setProperty(Request $request) {
+        if($request->filled('property') && $request->filled('value')) {
+            $property = $request->property;
+            $value = $request->value;
+            $user = Auth::user();
+            $user->$property = $value;
+            $user->save();
+            return response()->json([]);
+        }
+
+        return response()->json([],422);
+    }
+
 }

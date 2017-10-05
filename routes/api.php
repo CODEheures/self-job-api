@@ -22,4 +22,5 @@ Route::get('existUser', 'Api\UserController@exist');
 Route::middleware('auth:api')->group(function () {
     Route::post('logout', 'Api\Auth\OAuthController@logout');
     Route::get('user', 'Api\UserController@getUser');
+    Route::post('user/set', 'Api\UserController@setProperty');
 });
