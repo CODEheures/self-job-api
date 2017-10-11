@@ -1,0 +1,41 @@
+{
+  "properties": {
+    "title": {
+      "type": "text",
+      "analyzer": "french_light",
+      "fields": {
+        "stemmed": {
+          "type": "text",
+          "analyzer": "french_heavy"
+        }
+      }
+    },
+    "description": {
+      "type": "text",
+      "analyzer": "french_light",
+      "fields": {
+        "stemmed": {
+          "type": "text",
+          "analyzer": "french_heavy"
+        }
+      }
+    },
+    "tags": {
+      "type": "text",
+      "analyzer": "french_light",
+      "fields": {
+        "stemmed": {
+          "type": "text",
+          "analyzer": "french_heavy"
+        }
+      }
+    },
+    "location": {
+      "type": "geo_point"
+    },
+    "created": {
+      "type":   "date",
+      "format": "yyyy-MM-dd"
+    }
+  }
+}

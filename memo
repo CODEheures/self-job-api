@@ -1,0 +1,12 @@
+elasticsearch
+=================
+
+install:https://www.elastic.co/guide/en/elasticsearch/plugins/current/analysis-icu.html
+
+install analysis-icu:
+go to /usr/share/elasticsearch/bin
+./elasticsearch-plugin install analysis-icu
+https://www.elastic.co/guide/en/elasticsearch/plugins/current/analysis-icu.html
+
+Create index manually with settings
+Run a mapping
