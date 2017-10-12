@@ -13,12 +13,16 @@ class AdvertController extends Controller
     public function getAdverts(Request $request) {
 
         $adverts = [];
+        $size = 4;
+        $from = 0;
 
         if($request->filled('language') && in_array($request->language, config('app.availableLocales'))) {
             App::setlocale($request->language);
         }
 
-
+        if($request->filled('from') && is_int(filter_var($request->from, FILTER_VALIDATE_INT)) && filter_var($request->from, FILTER_VALIDATE_INT)>0) {
+            $from = filter_var($request->from, FILTER_VALIDATE_INT);
+        }
 
         if($request->filled('searchs') && is_array($request->searchs) && count($request->searchs) > 0){
 
@@ -35,8 +39,8 @@ class AdvertController extends Controller
             $location = null;
             if($request->filled('location')
                 && is_array($request->location)
-                && in_array('lat', $request->location)
-                && in_array('lon', $request->location)
+                && array_key_exists('lat', $request->location)
+                && array_key_exists('lon', $request->location)
                 && is_float(filter_var($request->location['lat'], FILTER_VALIDATE_FLOAT))
                 && is_float(filter_var($request->location['lon'], FILTER_VALIDATE_FLOAT))
             ){
@@ -47,9 +51,9 @@ class AdvertController extends Controller
             $mileage = null;
             if ($request->filled('mileage')
                 && is_array($request->mileage)
-                && in_array('min', $request->mileage)
-                && in_array('max', $request->mileage)
-                && in_array('stop', $request->mileage)
+                && array_key_exists('min', $request->mileage)
+                && array_key_exists('max', $request->mileage)
+                && array_key_exists('stop', $request->mileage)
                 && is_int(filter_var ($request->mileage['min'], FILTER_VALIDATE_INT))
                 && is_int(filter_var($request->mileage['max'], FILTER_VALIDATE_INT))
                 && is_int(filter_var($request->mileage['stop'], FILTER_VALIDATE_INT))
@@ -73,18 +77,22 @@ class AdvertController extends Controller
                     ->index(Advert::rootElasticIndex . App::getLocale())
                     ->multiMatch(['title', 'title.stemmed', 'description', 'description.stemmed', 'tags', 'tags.stemmed'], $search, ['fuzziness'=>'AUTO'])
                     ->geoDistance('location', $request->mileage['max'].'km', $request->location)
-                    ->get()->hits();
+                    ->from($from)
+                    ->size($size)
+                    ->get();
             } else {
                 $results = Advert::search()
                     ->index(Advert::rootElasticIndex . App::getLocale())
                     ->multiMatch(['title', 'title.stemmed', 'description', 'description.stemmed', 'tags', 'tags.stemmed'], $search, ['fuzziness'=>'AUTO'])
-                    ->get()->hits();
+                    ->from($from)
+                    ->size($size)
+                    ->get();
             }
 
 
             // Transform in a new collection and get users informations
 
-            $adverts = new Collection($results);
+            $adverts = new Collection($results->hits());
             $adverts->load(['user' => function ($query) {
                 $query->select(['id','company','contact']);
             }]);
@@ -101,6 +109,6 @@ class AdvertController extends Controller
 
         }
 
-        return response()->json($adverts);
+        return response()->json(['adverts' =>$adverts, 'totalHits' => $results->totalHits()]);
     }
 }

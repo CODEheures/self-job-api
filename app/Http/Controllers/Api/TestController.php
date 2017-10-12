@@ -12,7 +12,17 @@ use Illuminate\Support\Facades\App;
 class TestController extends Controller
 {
     public function test() {
-        return ElasticSearchUtils::reIndexAdverts();
+        //return ElasticSearchUtils::reIndexAdverts();
 
+        $adverts = Advert::search()
+            ->index(Advert::rootElasticIndex . 'fr')
+            ->multiMatch(['title', 'title.stemmed', 'description', 'description.stemmed', 'tags', 'tags.stemmed'], 'sed', ['fuzziness'=>'AUTO'])
+            ->from(50)
+            ->size(2)
+            ->get();
+
+        //$result = $adverts->result();
+
+        dd($adverts);
     }
 }
