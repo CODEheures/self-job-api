@@ -21,7 +21,7 @@ class Advert extends Model
     protected $fillable = [
         'documentIndex', 'title', 'description', 'location', 'locality', 'postal_code',
         'administrative_area_level_2', 'administrative_area_level_1', 'country', 'geoloc', 'tags',
-        'user_id'
+        'requirements', 'contract', 'user_id'
     ];
 
     /**
@@ -38,6 +38,7 @@ class Advert extends Model
      */
     protected $casts = [
         'tags' => 'array',
+        'requirements' => 'array',
         'location' => 'object'
     ];
 
@@ -49,7 +50,7 @@ class Advert extends Model
     protected $appends = array('mileage');
 
     //Searchable elastic search attributes
-    public $searchable = ['title', 'description', 'location', 'tags'];
+    public $searchable = ['title', 'description', 'location', 'tags', 'requirements', 'contract'];
 
 
     //Build document response for elastic
@@ -60,8 +61,10 @@ class Advert extends Model
             'title' => $this->title,
             'description' => $this->description,
             'tags' => $this->tags,
+            'requirements' => $this->requirements,
+            'contract' => $this->contract,
             'location' => $this->location,
-            'created' => Carbon::parse($this->created_at)->format('Y-m-d')
+            'created' => Carbon::parse($this->created_at)->toDateTimeString()
         ];
     }
 

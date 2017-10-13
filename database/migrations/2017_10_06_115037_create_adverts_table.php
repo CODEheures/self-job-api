@@ -26,6 +26,8 @@ class CreateAdvertsTable extends Migration
             }
             $table->string('geoloc')->nullable()->default(null);
             $table->text('tags')->nullable()->default(null);
+            $table->text('requirements')->nullable()->default(null);
+            $table->string('contract', 40)->nullable()->default(null);
             //relations
             $table->integer('user_id')->unsigned()->index();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

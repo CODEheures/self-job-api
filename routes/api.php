@@ -19,6 +19,7 @@ Route::post('login', 'Api\Auth\OAuthController@login');
 Route::post('refresh', 'Api\Auth\OAuthController@refresh');
 Route::get('existUser', 'Api\UserController@exist');
 Route::post('getAdverts', 'Api\AdvertController@getAdverts');
+Route::get('advert/{id}', 'Api\AdvertController@show');
 
 Route::middleware('auth:api')->group(function () {
     Route::post('logout', 'Api\Auth\OAuthController@logout');

@@ -15,8 +15,13 @@ use Faker\Generator as Faker;
 
 $factory->define(App\Advert::class, function (Faker $faker) {
 
-    $tags = collect(['Batiment', 'Peinture', 'Informatique', 'php', 'sql', 'facebook', 'voitures', 'ordinateur', 'bac+2', 'licence', 'bac pro', 'débutant', 'confirmé', 'disponible', 'mécanique', 'autonome', 'caces', 'permis A', 'carreleur', 'formation'])
+    $tags = collect(['Batiment', 'Peinture', 'Informatique', 'php', 'sql', 'facebook', 'voitures', 'ordinateur', 'disponible', 'mécanique', 'autonome', 'carreleur', 'formation'])
     ->random(3)->values()->all();
+
+    $requirements = collect(['CACES 1', 'CAP Peinture', 'BAC+2', 'Permis A', 'Permis B', 'Permis Poids Lours', 'licence LPATC', 'bac pro Génie civil', 'débutant', 'confirmé', '5 ans d\'experience'])
+        ->random(3)->values()->all();
+
+    $contract = ['cdi', 'cdd 6 mois', 'interim', 'mi-temps'][random_int(0,3)];
 
     $lat = $faker->latitude;
     $lon = $faker->longitude;
@@ -31,6 +36,8 @@ $factory->define(App\Advert::class, function (Faker $faker) {
         'administrative_area_level_1' => 'Centre-Val de Loire',
         'country' => 'FR',
         'geoloc' => '37300 Joué-lès-Tours, France',
-        'tags' => $tags
+        'tags' => $tags,
+        'requirements' => $requirements,
+        'contract' => $contract
     ];
 });

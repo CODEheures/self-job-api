@@ -30,12 +30,32 @@
         }
       }
     },
+    "requirements": {
+      "type": "text",
+      "analyzer": "french_light",
+      "fields": {
+        "stemmed": {
+          "type": "text",
+          "analyzer": "french_heavy"
+        }
+      }
+    },
+    "contract": {
+      "type": "text",
+      "analyzer": "french_light",
+      "fields": {
+        "stemmed": {
+          "type": "text",
+          "analyzer": "french_heavy"
+        }
+      }
+    },
     "location": {
       "type": "geo_point"
     },
     "created": {
       "type":   "date",
-      "format": "yyyy-MM-dd"
+      "format": "yyyy-MM-dd HH:mm:ss"
     }
   }
 }

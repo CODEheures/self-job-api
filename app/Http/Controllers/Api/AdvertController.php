@@ -75,7 +75,7 @@ class AdvertController extends Controller
             if ($location && $mileage & !$isStopMileage){
                 $results = Advert::search()
                     ->index(Advert::rootElasticIndex . App::getLocale())
-                    ->multiMatch(['title', 'title.stemmed', 'description', 'description.stemmed', 'tags', 'tags.stemmed'], $search, ['fuzziness'=>'AUTO'])
+                    ->multiMatch(['title', 'title.stemmed', 'description', 'description.stemmed', 'tags', 'tags.stemmed', 'requirements', 'requirements.stemmed', 'contract', 'contract.stemmed'], $search, ['fuzziness'=>'AUTO'])
                     ->geoDistance('location', $request->mileage['max'].'km', $request->location)
                     ->from($from)
                     ->size($size)
@@ -83,7 +83,7 @@ class AdvertController extends Controller
             } else {
                 $results = Advert::search()
                     ->index(Advert::rootElasticIndex . App::getLocale())
-                    ->multiMatch(['title', 'title.stemmed', 'description', 'description.stemmed', 'tags', 'tags.stemmed'], $search, ['fuzziness'=>'AUTO'])
+                    ->multiMatch(['title', 'title.stemmed', 'description', 'description.stemmed', 'tags', 'tags.stemmed', 'requirements', 'requirements.stemmed', 'contract', 'contract.stemmed'], $search, ['fuzziness'=>'AUTO'])
                     ->from($from)
                     ->size($size)
                     ->get();
@@ -110,5 +110,21 @@ class AdvertController extends Controller
         }
 
         return response()->json(['adverts' =>$adverts, 'totalHits' => $results->totalHits()]);
+    }
+
+    public function show($id) {
+
+        $advert = Advert::find($id);
+
+        if($advert) {
+            $advert->load(['user' => function ($query) {
+                $query->select(['id','company','contact']);
+            }]);
+            return response()->json($advert);
+        } else {
+            return response('Not found', 404);
+        }
+
+
     }
 }
