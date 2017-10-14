@@ -127,4 +127,12 @@ class AdvertController extends Controller
 
 
     }
+
+    public function getMyAdverts() {
+
+        $adverts = Advert::with('user')->where('user_id', auth()->id())->get();
+        return response()->json($adverts);
+
+
+    }
 }
