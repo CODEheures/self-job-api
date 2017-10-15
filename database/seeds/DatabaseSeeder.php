@@ -1,6 +1,7 @@
 <?php
 
 use App\Advert;
+use App\Question;
 use App\User;
 use Illuminate\Database\Seeder;
 use Laravel\Passport\ClientRepository;
@@ -65,6 +66,22 @@ Fusce ligula nisi, ullamcorper nec leo fermentum, commodo convallis nibh. Donec 
         $advert1->contract = 'cdi';
 
         $advert1->save();
+
+        $question1 = new Question();
+        $question1->type = 0;
+        $question1->order = 0;
+        $question1->datas = [
+            'title' => 'Vous préférez',
+            'choices' => [
+                ['item' => 'Les pommes', 'value' => '1'],
+                ['item' => 'Les poires', 'value' => '2'],
+                ['item' => 'Les kiwis', 'value' => '3'],
+            ],
+        ];
+        $question1->expected = [2,1,3];
+        $question1->advert_id = $advert1->id;
+
+        $question1->save();
 
         factory(App\User::class, 10)->create();
         foreach (App\User::get() as $user) {

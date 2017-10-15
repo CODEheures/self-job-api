@@ -5,12 +5,12 @@ namespace App;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Iatstuti\Database\Support\CascadeSoftDeletes;
 use Sleimanx2\Plastic\Searchable;
 
 class Advert extends Model
 {
-    use SoftDeletes;
-    use Searchable;
+    use SoftDeletes, Searchable, CascadeSoftDeletes;
 
     const rootElasticIndex = 'selfjob_adverts_';
     /**
@@ -32,6 +32,13 @@ class Advert extends Model
     protected $dates = ['deleted_at'];
 
     /**
+     * The relation to cascadeSoftDelete
+     *
+     * @var array
+     */
+    protected $cascadeDeletes = ['questions'];
+
+    /**
      *
      *
      * @var array
@@ -46,6 +53,7 @@ class Advert extends Model
 
     //Relations
     public function user() { return $this->belongsTo(User::class); }
+    public function questions() { return $this->hasMany(Question::class); }
 
     protected $appends = array('mileage');
 

@@ -37,6 +37,11 @@ class User extends Authenticatable
      */
     protected $dates = ['deleted_at'];
 
+    /**
+     * The relation to cascadeSoftDelete
+     *
+     * @var array
+     */
     protected $cascadeDeletes = ['adverts'];
 
     //relations

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Advert;
 use App\Common\Elasticsearch\ElasticSearchUtils;
+use App\Question;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
@@ -15,10 +16,19 @@ class TestController extends Controller
     public function test() {
         //return ElasticSearchUtils::reIndexAdverts();
 
-        $advert = Advert::first();
+        $question = Question::first();
+        $question->datas->choices[0]->item = "Les raisins";
 
-        //$result = $adverts->result();
+        $datas = $question->datas;
+        $datas->choices[0]->item = "Les raisins";
 
-        dd((Carbon::parse($advert->created_at)->toIso8601String()));
+        $question->datas = $datas;
+        $question->save();
+        dd($question);
+
+
+        $question->save();
+
+        dd($question->datas);
     }
 }
