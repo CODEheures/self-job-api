@@ -13,6 +13,7 @@ class AdvertController extends Controller
     public function getAdverts(Request $request) {
 
         $adverts = [];
+
         $size = 4;
         $from = 0;
 
@@ -24,7 +25,9 @@ class AdvertController extends Controller
             $from = filter_var($request->from, FILTER_VALIDATE_INT);
         }
 
-        if($request->filled('searchs') && is_array($request->searchs) && count($request->searchs) > 0){
+        //Set search
+        $search = null;
+        if($request->filled('searchs') && is_array($request->searchs) && count($request->searchs) > 0) {
 
             // Searchs combine on a string for multimatch
             $search = trim(array_reduce($request->searchs,
@@ -33,81 +36,133 @@ class AdvertController extends Controller
                     return $carry;
                 }
             ));
+        }
 
 
-            // Set or not Location
-            $location = null;
-            if($request->filled('location')
-                && is_array($request->location)
-                && array_key_exists('lat', $request->location)
-                && array_key_exists('lon', $request->location)
-                && is_float(filter_var($request->location['lat'], FILTER_VALIDATE_FLOAT))
-                && is_float(filter_var($request->location['lon'], FILTER_VALIDATE_FLOAT))
-            ){
-                $location = $request->location;
-            }
+        // Set or not Location
+        $location = null;
+        if($request->filled('location')
+            && is_array($request->location)
+            && array_key_exists('lat', $request->location)
+            && array_key_exists('lon', $request->location)
+            && is_float(filter_var($request->location['lat'], FILTER_VALIDATE_FLOAT))
+            && is_float(filter_var($request->location['lon'], FILTER_VALIDATE_FLOAT))
+        ){
+            $location = $request->location;
+        }
 
-            //Set or not mileage
-            $mileage = null;
-            if ($request->filled('mileage')
-                && is_array($request->mileage)
-                && array_key_exists('min', $request->mileage)
-                && array_key_exists('max', $request->mileage)
-                && array_key_exists('stop', $request->mileage)
-                && is_int(filter_var ($request->mileage['min'], FILTER_VALIDATE_INT))
-                && is_int(filter_var($request->mileage['max'], FILTER_VALIDATE_INT))
-                && is_int(filter_var($request->mileage['stop'], FILTER_VALIDATE_INT))
-                && (filter_var ($request->mileage['min'], FILTER_VALIDATE_INT))>=0
-                && (filter_var ($request->mileage['max'], FILTER_VALIDATE_INT))>=0
-                && (filter_var ($request->mileage['stop'], FILTER_VALIDATE_INT))>=0
-            ){
-                $mileage = [
-                    'min' => filter_var ($request->mileage['min'], FILTER_VALIDATE_INT),
-                    'max' => filter_var ($request->mileage['max'], FILTER_VALIDATE_INT),
-                    'stop' => filter_var ($request->mileage['stop'], FILTER_VALIDATE_INT)
-                ];
-            }
+        //Set or not mileage
+        $mileage = null;
+        if ($request->filled('mileage')
+            && is_array($request->mileage)
+            && array_key_exists('min', $request->mileage)
+            && array_key_exists('max', $request->mileage)
+            && array_key_exists('stop', $request->mileage)
+            && is_int(filter_var ($request->mileage['min'], FILTER_VALIDATE_INT))
+            && is_int(filter_var($request->mileage['max'], FILTER_VALIDATE_INT))
+            && is_int(filter_var($request->mileage['stop'], FILTER_VALIDATE_INT))
+            && (filter_var ($request->mileage['min'], FILTER_VALIDATE_INT))>=0
+            && (filter_var ($request->mileage['max'], FILTER_VALIDATE_INT))>=0
+            && (filter_var ($request->mileage['stop'], FILTER_VALIDATE_INT))>=0
+        ){
+            $mileage = [
+                'min' => filter_var ($request->mileage['min'], FILTER_VALIDATE_INT),
+                'max' => filter_var ($request->mileage['max'], FILTER_VALIDATE_INT),
+                'stop' => filter_var ($request->mileage['stop'], FILTER_VALIDATE_INT)
+            ];
+        }
 
-            // Determine if a max distance is requested
-            $isStopMileage = $mileage['max'] >= $mileage['stop'];
+        // Determine if a max distance is requested
+        $isStopMileage = $mileage['max'] >= $mileage['stop'];
 
-            // Get results
-            if ($location && $mileage & !$isStopMileage){
-                $results = Advert::search()
-                    ->index(Advert::rootElasticIndex . App::getLocale())
-                    ->multiMatch(['title', 'title.stemmed', 'description', 'description.stemmed', 'tags', 'tags.stemmed', 'requirements', 'requirements.stemmed', 'contract', 'contract.stemmed'], $search, ['fuzziness'=>'AUTO'])
-                    ->geoDistance('location', $request->mileage['max'].'km', $request->location)
-                    ->from($from)
-                    ->size($size)
-                    ->get();
-            } else {
-                $results = Advert::search()
-                    ->index(Advert::rootElasticIndex . App::getLocale())
-                    ->multiMatch(['title', 'title.stemmed', 'description', 'description.stemmed', 'tags', 'tags.stemmed', 'requirements', 'requirements.stemmed', 'contract', 'contract.stemmed'], $search, ['fuzziness'=>'AUTO'])
-                    ->from($from)
-                    ->size($size)
-                    ->get();
-            }
+        //***************** Get results***********************//
+
+        //CASES WITH SEARCH (NO SORTBY DISTANCE)
+        // CASE 1 search in a limit distance
+        if ($search && $location && $mileage & !$isStopMileage){
+            $results = Advert::search()
+                ->index(Advert::rootElasticIndex . App::getLocale())
+                ->multiMatch(['title', 'title.stemmed', 'description', 'description.stemmed', 'tags', 'tags.stemmed', 'requirements', 'requirements.stemmed', 'contract', 'contract.stemmed'], $search, ['fuzziness'=>'AUTO'])
+                ->geoDistance('location', $request->mileage['max'].'km', $request->location)
+                ->from($from)
+                ->size($size)
+                ->get();
+        }
+
+        // CASE 1b search but no geodistance limit
+        if ($search && $location && $mileage & $isStopMileage){
+            $results = Advert::search()
+                ->index(Advert::rootElasticIndex . App::getLocale())
+                ->multiMatch(['title', 'title.stemmed', 'description', 'description.stemmed', 'tags', 'tags.stemmed', 'requirements', 'requirements.stemmed', 'contract', 'contract.stemmed'], $search, ['fuzziness'=>'AUTO'])
+                ->from($from)
+                ->size($size)
+                ->get();
+        }
+
+        // CASE 1c Search without Location informations
+        if ($search && (is_null($location) || is_null($mileage))){
+            $results = Advert::search()
+                ->index(Advert::rootElasticIndex . App::getLocale())
+                ->multiMatch(['title', 'title.stemmed', 'description', 'description.stemmed', 'tags', 'tags.stemmed', 'requirements', 'requirements.stemmed', 'contract', 'contract.stemmed'], $search, ['fuzziness' => 'AUTO'])
+                ->from($from)
+                ->size($size)
+                ->get();
+        }
 
 
-            // Transform in a new collection and get users informations
+        // CASE 2 WITHOUT SEARCH
+        //CASE 2a in a limit distance
+        if (is_null($search) && $location && $mileage & !$isStopMileage){
+            $results = Advert::search()
+                ->index(Advert::rootElasticIndex . App::getLocale())
+                ->matchAll()
+                ->geoDistance('location', $request->mileage['max'].'km', $request->location)
+                ->sortBy('_geo_distance', 'asc', ['location' => $request->location])
+                ->from($from)
+                ->size($size)
+                ->get();
+        }
 
-            $adverts = new Collection($results->hits());
-            $adverts->load(['user' => function ($query) {
-                $query->select(['id','company','contact']);
-            }]);
+        //CASE 2b without a limit distance
+        if (is_null($search) && $location && $mileage & $isStopMileage){
+            $results = Advert::search()
+                ->index(Advert::rootElasticIndex . App::getLocale())
+                ->matchAll()
+                ->sortBy('_geo_distance', 'asc', ['location' => $request->location])
+                ->from($from)
+                ->size($size)
+                ->get();
+        }
 
-            // Set the mileage and unset minimum mileage request
-            if ($location && $mileage) {
-                foreach ($adverts as $key => $advert) {
-                    $advert->setMileage($location['lat'], $location['lon']);
-                    if($advert->mileage < $mileage['min']) {
-                        unset($adverts[$key]);
-                    }
+        //CASE 2c without location informations
+        if (is_null($search) && (is_null($location) || is_null($mileage))) {
+            $results = Advert::search()
+                ->index(Advert::rootElasticIndex . App::getLocale())
+                ->matchAll()
+                ->from($from)
+                ->size($size)
+                ->get();
+        }
+
+
+
+        // Transform in a new collection and get users informations
+        $adverts = new Collection($results->hits());
+        $adverts->load(['user' => function ($query) {
+            $query->select(['id','company','contact']);
+        }]);
+
+        // Set the mileage and unset minimum mileage request
+        if ($location && $mileage) {
+            foreach ($adverts as $key => $advert) {
+                $advert->setMileage($location['lat'], $location['lon']);
+                if($advert->mileage < $mileage['min']) {
+                    unset($adverts[$key]);
                 }
             }
-
         }
+
+
 
         return response()->json(['adverts' =>$adverts, 'totalHits' => $results->totalHits()]);
     }
