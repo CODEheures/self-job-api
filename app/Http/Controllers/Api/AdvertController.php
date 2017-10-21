@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Facades\Image;
 
 class AdvertController extends Controller
 {
@@ -189,5 +191,25 @@ class AdvertController extends Controller
         return response()->json($adverts);
 
 
+    }
+
+    public function postImg (Request $request) {
+        $sucess = $request->file('tempo')->storeAs('tempo', auth()->id() . '.' . $request->file('tempo')->guessExtension());
+        if ($sucess) {
+            $uploadedFile = Storage::disk('tempo')->get(auth()->id() . '.' . $request->file('tempo')->guessExtension());
+            Image::make($uploadedFile)->widen(700,function ($constraint) {
+                $constraint->upsize();
+            })->encode('png')->save(storage_path('app/tempo/'. auth()->id() .'.png'));
+            Storage::disk('tempo')->delete(auth()->id() . '.' . $request->file('tempo')->guessExtension());
+            return response('ok', 200);
+        } else {
+            return response('ko', 500);
+        }
+    }
+
+    public function getTempoImg () {
+        $path = storage_path('app/tempo/'. auth()->id() .'.png');
+        $image = Image::make($path)->encode('data-url');
+        return response($image,200);
     }
 }

@@ -27,4 +27,6 @@ Route::middleware('auth:api')->group(function () {
     Route::get('user', 'Api\UserController@getUser');
     Route::post('user/set', 'Api\UserController@setProperty');
     Route::get('myAdverts', 'Api\AdvertController@getMyAdverts');
+    Route::post('advert/img', 'Api\AdvertController@postImg');
+    Route::get('advert/img/tempo', 'Api\AdvertController@getTempoImg');
 });
