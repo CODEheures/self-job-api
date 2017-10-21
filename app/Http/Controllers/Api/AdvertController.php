@@ -12,6 +12,9 @@ use Intervention\Image\Facades\Image;
 
 class AdvertController extends Controller
 {
+    const _ext = 'png';
+
+
     public function getAdverts(Request $request) {
 
         $adverts = [];
@@ -194,13 +197,27 @@ class AdvertController extends Controller
     }
 
     public function postImg (Request $request) {
-        $sucess = $request->file('tempo')->storeAs('tempo', auth()->id() . '.' . $request->file('tempo')->guessExtension());
+
+        $size = 700;
+        $ratio = 16/9;
+        $back_color = '#eeeeee';
+        $picture_height = round($size/$ratio);
+
+        $sucess = $request->file('tempo')->storeAs('tempo', auth()->id() . '_original.' . $request->file('tempo')->guessExtension());
         if ($sucess) {
-            $uploadedFile = Storage::disk('tempo')->get(auth()->id() . '.' . $request->file('tempo')->guessExtension());
-            Image::make($uploadedFile)->widen(700,function ($constraint) {
-                $constraint->upsize();
-            })->encode('png')->save(storage_path('app/tempo/'. auth()->id() .'.png'));
-            Storage::disk('tempo')->delete(auth()->id() . '.' . $request->file('tempo')->guessExtension());
+            $uploadedFile = Storage::disk('tempo')->get(auth()->id() . '_original.' . $request->file('tempo')->guessExtension());
+
+            $picture = Image::make($uploadedFile);
+            $picture->resize($size, $picture_height, function ($constraint) {
+                $constraint->aspectRatio();
+            });
+
+            $raw = Image::canvas($size, $picture_height, $back_color);
+            $raw->insert($picture, 'center');
+            $raw->encode(self::_ext);
+            $raw->save(storage_path('app/tempo/'. auth()->id() .'.' . self::_ext));
+
+            Storage::disk('tempo')->delete(auth()->id() . '_original.' . $request->file('tempo')->guessExtension());
             return response('ok', 200);
         } else {
             return response('ko', 500);
@@ -208,8 +225,17 @@ class AdvertController extends Controller
     }
 
     public function getTempoImg () {
-        $path = storage_path('app/tempo/'. auth()->id() .'.png');
-        $image = Image::make($path)->encode('data-url');
-        return response($image,200);
+        $path = storage_path('app/tempo/'. auth()->id() . '.' . self::_ext);
+        if (file_exists($path)) {
+            return response(file_get_contents($path),200);
+        } else {
+            return response('not found', 404);
+        }
+
+    }
+
+    public function deleteTempoImg () {
+        Storage::disk('tempo')->delete(auth()->id() . '.' . self::_ext);
+        return response('ok',200);
     }
 }

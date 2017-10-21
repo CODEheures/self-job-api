@@ -29,4 +29,5 @@ Route::middleware('auth:api')->group(function () {
     Route::get('myAdverts', 'Api\AdvertController@getMyAdverts');
     Route::post('advert/img', 'Api\AdvertController@postImg');
     Route::get('advert/img/tempo', 'Api\AdvertController@getTempoImg');
+    Route::delete('advert/img/tempo', 'Api\AdvertController@deleteTempoImg');
 });
