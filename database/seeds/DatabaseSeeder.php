@@ -71,11 +71,11 @@ Fusce ligula nisi, ullamcorper nec leo fermentum, commodo convallis nibh. Donec 
         $question1->type = 0;
         $question1->order = 0;
         $question1->datas = [
-            'title' => 'Vous préférez',
-            'choices' => [
-                ['item' => 'Les pommes', 'value' => '1'],
-                ['item' => 'Les poires', 'value' => '2'],
-                ['item' => 'Les kiwis', 'value' => '3'],
+            'label' => 'Vous préférez',
+            'options' => [
+                ['name' => 'Les pommes', 'value' => '1'],
+                ['name' => 'Les poires', 'value' => '2'],
+                ['name' => 'Les kiwis', 'value' => '3'],
             ],
         ];
         $question1->expected = [2,1,3];
