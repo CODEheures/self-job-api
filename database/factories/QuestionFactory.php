@@ -21,9 +21,9 @@ $factory->define(App\Question::class, function (Faker $faker) {
         'data' => [
             'label' => 'Vous préférez',
             'options' => [
-                ['name' => 'Les pommes', 'value' => '2'],
-                ['name' => 'Les poires', 'value' => '1'],
-                ['name' => 'Les kiwis', 'value' => '3'],
+                ['label' => 'Les pommes', 'value' => '2'],
+                ['label' => 'Les poires', 'value' => '1'],
+                ['label' => 'Les kiwis', 'value' => '3'],
             ],
         ],
     ];

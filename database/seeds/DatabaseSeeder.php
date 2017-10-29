@@ -73,9 +73,9 @@ Fusce ligula nisi, ullamcorper nec leo fermentum, commodo convallis nibh. Donec 
         $question1->datas = [
             'label' => 'Vous préférez',
             'options' => [
-                ['name' => 'Les pommes', 'value' => '1'],
-                ['name' => 'Les poires', 'value' => '2'],
-                ['name' => 'Les kiwis', 'value' => '3'],
+                ['label' => 'Les pommes', 'value' => '1'],
+                ['label' => 'Les poires', 'value' => '2'],
+                ['label' => 'Les kiwis', 'value' => '3'],
             ],
         ];
         $question1->expected = [2,1,3];
