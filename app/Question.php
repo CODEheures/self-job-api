@@ -22,7 +22,7 @@ class Question extends Model
      * @var array
      */
     protected $hidden = [
-        'expected'
+        'datas'
     ];
 
     /**
@@ -46,11 +46,26 @@ class Question extends Model
      */
     protected $casts = [
         'datas' => 'object',
-        'expected' => 'object'
     ];
 
+    protected $appends = array('form');
 
     //relations
     public function advert() { return $this->belongsTo(Advert::class); }
     public function answers() { return $this->belongsTo(Answer::class); }
+
+    // Getters
+    public function getFormAttribute() {
+        switch ($this->type) {
+            case 0:
+                $form = $this->datas;
+                foreach ($form->options as $option){
+                    unset ($option->rank);
+                }
+                break;
+            default:
+                return null;
+        }
+        return $form;
+    }
 }

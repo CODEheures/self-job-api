@@ -20,7 +20,6 @@ class CreateQuestionsTable extends Migration
             $table->tinyInteger('type')->unsigned();
             $table->tinyInteger('order')->unsigned();
             $table->text('datas');
-            $table->text('expected');
             //relations
             $table->integer('advert_id')->unsigned()->index();
             $table->foreign('advert_id')->references('id')->on('adverts')->onDelete('cascade');

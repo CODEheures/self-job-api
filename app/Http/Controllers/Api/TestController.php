@@ -16,19 +16,9 @@ class TestController extends Controller
     public function test() {
         //return ElasticSearchUtils::reIndexAdverts();
 
-        $question = Question::first();
-        $question->datas->choices[0]->item = "Les raisins";
-
-        $datas = $question->datas;
-        $datas->choices[0]->item = "Les raisins";
-
-        $question->datas = $datas;
-        $question->save();
-        dd($question);
+        $var = Question::first();
 
 
-        $question->save();
-
-        dd($question->datas);
+        return view('debug', compact('var'));
     }
 }

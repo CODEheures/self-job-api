@@ -73,12 +73,11 @@ Fusce ligula nisi, ullamcorper nec leo fermentum, commodo convallis nibh. Donec 
         $question1->datas = [
             'label' => 'Vous préférez',
             'options' => [
-                ['label' => 'Les pommes', 'value' => '1'],
-                ['label' => 'Les poires', 'value' => '2'],
-                ['label' => 'Les kiwis', 'value' => '3'],
+                ['label' => 'Les pommes', 'value' => '1', 'rank' => [2]],
+                ['label' => 'Les poires', 'value' => '2', 'rank' => [0]],
+                ['label' => 'Les kiwis', 'value' => '3', 'rank' => [1]],
             ],
         ];
-        $question1->expected = [2,1,3];
         $question1->advert_id = $advert1->id;
 
         $question1->save();
