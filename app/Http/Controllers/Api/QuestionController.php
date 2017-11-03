@@ -23,5 +23,11 @@ class QuestionController extends Controller
 
     }
 
+    public function getLibrary() {
+
+        $questions = auth()->user()->questions()->where('inLibrary', true)->get();
+        return response()->json($questions->makeVisible('datas'));
+
+    }
 
 }

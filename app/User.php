@@ -46,4 +46,5 @@ class User extends Authenticatable
 
     //relations
     public function adverts() { return $this->hasMany(Advert::class); }
+    public function questions() { return $this->hasManyThrough(Question::class, Advert::class); }
 }

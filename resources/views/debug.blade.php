@@ -5,7 +5,7 @@
 </head>
 <body class="portal yellowbg">
     @php
-        (new Symfony\Component\VarDumper\VarDumper())->dump($var->form);
+        (new Symfony\Component\VarDumper\VarDumper())->dump($var);
     @endphp
 </body>
 </html>
