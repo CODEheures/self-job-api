@@ -20,6 +20,7 @@ class CreateQuestionsTable extends Migration
             $table->tinyInteger('type')->unsigned();
             $table->tinyInteger('order')->unsigned();
             $table->text('datas');
+            $table->string('md5', 32);
             $table->boolean('inLibrary')->default(true);
             //relations
             $table->integer('advert_id')->unsigned()->index();

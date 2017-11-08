@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Advert;
+use App\Question;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -14,6 +15,47 @@ class AdvertController extends Controller
 {
     const _ext = 'png';
 
+
+    public function postAdvert (Request $request) {
+        if ($request->filled('advert') && $request->filled('questions') && $request->filled('language') && in_array($request->language, config('app.availableLocales'))) {
+            $advert = is_array($request->advert) ? $request->advert :  json_decode($request->advert, true);
+            $questions = is_array($request->questions) ? $request->questions : json_decode($request->questions, true);
+            $language = $request->language;
+
+            if ($this->testAdvertRequestStructure($advert) && $this->testQuestionsRequestStructure($questions)) {
+
+                $newAdvert = new Advert();
+                $newAdvert->documentIndex = Advert::rootElasticIndex . $language;
+                $newAdvert->title = $advert['title'];
+                $newAdvert->description = $advert['description'];
+                $newAdvert->user_id = auth()->id();
+                $newAdvert->location = ['lat' => $advert['place']['lat'], 'lon' => $advert['place']['lon']];
+                $newAdvert->formatted_address = $advert['place']['formatted_address'];
+                $newAdvert->tags = $advert['tags'];
+                $newAdvert->requirements = $advert['requirements'];
+                $newAdvert->contract = $advert['contract'];
+                $newAdvert->save();
+
+                foreach ($questions as $index => $question) {
+                    $newQuestion = new Question();
+                    $newQuestion->type = $question['type'];
+                    $newQuestion->order = $index;
+                    $newQuestion->datas = $this->constructQuestionsDatas($question);
+                    $newQuestion->advert_id = $newAdvert->id;
+                    $newQuestion->save();
+                }
+
+                return response('ok', 200);
+            } else {
+                return response()->json([gettype()],422);
+            }
+
+        } else {
+            return response('ko', 422);
+        }
+
+
+    }
 
     public function getAdverts(Request $request) {
 
@@ -237,5 +279,104 @@ class AdvertController extends Controller
     public function deleteTempoImg () {
         Storage::disk('tempo')->delete(auth()->id() . '.' . self::_ext);
         return response('ok',200);
+    }
+
+    private function testAdvertRequestStructure ($advert) {
+
+        if (!is_array($advert)) {
+            return false;
+        }
+
+        $keys = ['title', 'description', 'contract', 'tags', 'requirements', 'place'];
+        foreach ($keys as $key) {
+            if (!key_exists($key, $advert)) {
+                return false;
+            }
+        }
+
+        if (!is_string($advert['title'])
+            || !is_string($advert['contract'])
+            || strlen($advert['contract']) > Advert::contractLenght
+            || strlen($advert['title']) > Advert::titleLength
+            || !is_array($advert['tags'])
+            || !is_array($advert['requirements'])
+        ){
+            return false;
+        }
+
+        $keys = ['formatted_address', 'lat', 'lon'];
+        foreach ($keys as $key) {
+            if (!key_exists($key, $advert['place'])) {
+                return false;
+            }
+        }
+        if (!is_string($advert['place']['formatted_address'])
+            || !filter_var($advert['place']['lat'], FILTER_VALIDATE_FLOAT)
+            || !filter_var($advert['place']['lon'], FILTER_VALIDATE_FLOAT)
+            || abs(filter_var($advert['place']['lat'], FILTER_VALIDATE_FLOAT))>90
+            || abs(filter_var($advert['place']['lon'], FILTER_VALIDATE_FLOAT))>180
+        ){
+            return false;
+        }
+
+        return true;
+
+    }
+
+    private function testQuestionsRequestStructure ($questions) {
+        if (!is_array($questions)) {
+            return false;
+        }
+
+        foreach ($questions as $question){
+            if (!key_exists('type', $question)) {
+                return false;
+            }
+
+            switch ($question['type']) {
+                case 0:
+                case 1:
+                case 2:
+                    $keys = ['label', 'options'];
+                    foreach ($keys as $key) {
+                        if (!key_exists($key, $question)) {
+                            return false;
+                        }
+                    }
+
+                    if (!is_array($question['options']) || count($question['options']) < 2){
+                        return false;
+                    }
+
+                    foreach ($question['options'] as $option) {
+                        $keys = ['label', 'value', 'rank'];
+                        foreach ($keys as $key) {
+                            if (!key_exists($key, $option)) {
+                                return false;
+                            }
+                        }
+                    }
+                    break;
+            }
+        }
+
+        return true;
+
+    }
+
+    private function constructQuestionsDatas ($question) {
+        $datas = [];
+        switch ($question['type']) {
+            case 0:
+            case 1:
+            case 2:
+                $datas = [
+                    'label' => $question['label'],
+                    'options' => $question['options']
+                ];
+                break;
+        }
+
+        return $datas;
     }
 }

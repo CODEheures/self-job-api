@@ -55,12 +55,7 @@ Fusce ligula nisi, ullamcorper nec leo fermentum, commodo convallis nibh. Donec 
 
         $advert1->user_id = $user1->id;
         $advert1->location = ['lat' => 47.3477, 'lon' => 0.6489845999999488];
-        $advert1->locality = 'Joué-lès-Tours';
-        $advert1->postal_code = '37300';
-        $advert1->administrative_area_level_2 = 'Indre-et-Loire';
-        $advert1->administrative_area_level_1 = 'Centre-Val de Loire';
-        $advert1->country = 'FR';
-        $advert1->geoloc = '37300 Joué-lès-Tours, France';
+        $advert1->formatted_address = '37300 Joué-lès-Tours, France';
         $advert1->tags = ['Peintre', 'Bâtiment', 'Confirmé'];
         $advert1->requirements = ['CAP peinture', 'CACES 1,2 & 3', '10 ans d\'expérience', 'permis B'];
         $advert1->contract = 'cdi';

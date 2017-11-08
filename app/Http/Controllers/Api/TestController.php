@@ -23,8 +23,9 @@ class TestController extends Controller
         //$var = $user->questions;
 
         $user = User::first();
-        $var = $user->questions()->where('inLibrary', false)->get();
+        $var = $user->questions()->where('inLibrary', true)->select('type', 'datas', 'md5')->get();
 
-        return response()->json($var);
+        $uniq = array_merge([],$var->makeVisible('datas')->unique('md5')->toArray());
+        return response()->json($uniq);
     }
 }

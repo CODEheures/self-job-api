@@ -30,12 +30,7 @@ $factory->define(App\Advert::class, function (Faker $faker) {
         'title' => $faker->sentence(),
         'description' => $faker->paragraph(3),
         'location' => ['lat' => $lat, 'lon' => $lon],
-        'locality' => $faker->city,
-        'postal_code' => $faker->postcode,
-        'administrative_area_level_2' => 'Indre-et-Loire',
-        'administrative_area_level_1' => 'Centre-Val de Loire',
-        'country' => 'FR',
-        'geoloc' => '37300 Joué-lès-Tours, France',
+        'formatted_address' => '37300 Joué-lès-Tours, France',
         'tags' => $tags,
         'requirements' => $requirements,
         'contract' => $contract

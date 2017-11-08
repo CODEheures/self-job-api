@@ -12,6 +12,8 @@ class Advert extends Model
 {
     use SoftDeletes, Searchable, CascadeSoftDeletes;
 
+    const titleLength = 120;
+    const contractLenght = 40;
     const rootElasticIndex = 'selfjob_adverts_';
     /**
      * The attributes that are mass assignable.
@@ -19,8 +21,7 @@ class Advert extends Model
      * @var array
      */
     protected $fillable = [
-        'documentIndex', 'title', 'description', 'location', 'locality', 'postal_code',
-        'administrative_area_level_2', 'administrative_area_level_1', 'country', 'geoloc', 'tags',
+        'documentIndex', 'title', 'description', 'location', 'formatted_address', 'tags',
         'requirements', 'contract', 'user_id'
     ];
 

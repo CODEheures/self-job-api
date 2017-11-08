@@ -58,6 +58,8 @@ class Question extends Model
     public function getFormAttribute() {
         switch ($this->type) {
             case 0:
+            case 1:
+            case 2:
                 $form = $this->datas;
                 foreach ($form->options as $option){
                     unset ($option->rank);

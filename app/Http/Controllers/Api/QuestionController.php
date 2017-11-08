@@ -25,8 +25,8 @@ class QuestionController extends Controller
 
     public function getLibrary() {
 
-        $questions = auth()->user()->questions()->where('inLibrary', true)->get();
-        return response()->json($questions->makeVisible('datas'));
+        $questions = auth()->user()->questions()->where('inLibrary', true)->select('type', 'datas', 'md5')->get();
+        return response()->json(array_merge([], $questions->makeVisible('datas')->unique('md5')->toArray()));
 
     }
 

@@ -18,16 +18,13 @@ class CreateAdvertsTable extends Migration
             $table->timestamps();
             $table->softDeletes();
             $table->string('documentIndex', 24);
-            $table->string('title', 120);
+            $table->string('title', \App\Advert::titleLength);
             $table->text('description');
             $table->string('location');
-            foreach (\App\Common\GeoManager::$accurate as $key){
-                $table->string($key)->nullable()->default(null);
-            }
-            $table->string('geoloc')->nullable()->default(null);
+            $table->string('formatted_address');
             $table->text('tags')->nullable()->default(null);
             $table->text('requirements')->nullable()->default(null);
-            $table->string('contract', 40)->nullable()->default(null);
+            $table->string('contract', \App\Advert::contractLenght)->nullable()->default(null);
             //relations
             $table->integer('user_id')->unsigned()->index();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
