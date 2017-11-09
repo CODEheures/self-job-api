@@ -34,5 +34,6 @@ Route::middleware('auth:api')->group(function () {
     Route::delete('advert/img/tempo', 'Api\AdvertController@deleteTempoImg');
     Route::post('advert', 'Api\AdvertController@postAdvert');
     Route::get('question/library', 'Api\QuestionController@getLibrary');
+    Route::put('question/library/remove', 'Api\QuestionController@removeOfLibrary');
 
 });

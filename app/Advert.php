@@ -103,4 +103,45 @@ class Advert extends Model
             $this->mileage = (int)($L/1000);
         }
     }
+
+    //public statics tools function
+    public static function testStructure($advert) {
+        if (!is_array($advert)) {
+            return false;
+        }
+
+        $keys = ['title', 'description', 'contract', 'tags', 'requirements', 'place'];
+        foreach ($keys as $key) {
+            if (!key_exists($key, $advert)) {
+                return false;
+            }
+        }
+
+        if (!is_string($advert['title'])
+            || !is_string($advert['contract'])
+            || strlen($advert['contract']) > Advert::contractLenght
+            || strlen($advert['title']) > Advert::titleLength
+            || !is_array($advert['tags'])
+            || !is_array($advert['requirements'])
+        ){
+            return false;
+        }
+
+        $keys = ['formatted_address', 'lat', 'lon'];
+        foreach ($keys as $key) {
+            if (!key_exists($key, $advert['place'])) {
+                return false;
+            }
+        }
+        if (!is_string($advert['place']['formatted_address'])
+            || !filter_var($advert['place']['lat'], FILTER_VALIDATE_FLOAT)
+            || !filter_var($advert['place']['lon'], FILTER_VALIDATE_FLOAT)
+            || abs(filter_var($advert['place']['lat'], FILTER_VALIDATE_FLOAT))>90
+            || abs(filter_var($advert['place']['lon'], FILTER_VALIDATE_FLOAT))>180
+        ){
+            return false;
+        }
+
+        return true;
+    }
 }

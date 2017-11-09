@@ -22,7 +22,7 @@ class AdvertController extends Controller
             $questions = is_array($request->questions) ? $request->questions : json_decode($request->questions, true);
             $language = $request->language;
 
-            if ($this->testAdvertRequestStructure($advert) && $this->testQuestionsRequestStructure($questions)) {
+            if (Advert::testStructure($advert) && $this->testQuestionsStructure($questions)) {
 
                 $newAdvert = new Advert();
                 $newAdvert->documentIndex = Advert::rootElasticIndex . $language;
@@ -40,14 +40,14 @@ class AdvertController extends Controller
                     $newQuestion = new Question();
                     $newQuestion->type = $question['type'];
                     $newQuestion->order = $index;
-                    $newQuestion->datas = $this->constructQuestionsDatas($question);
+                    $newQuestion->datas = $question['datas'];
                     $newQuestion->advert_id = $newAdvert->id;
                     $newQuestion->save();
                 }
 
                 return response('ok', 200);
             } else {
-                return response()->json([gettype()],422);
+                return response('ko', 422);
             }
 
         } else {
@@ -281,102 +281,20 @@ class AdvertController extends Controller
         return response('ok',200);
     }
 
-    private function testAdvertRequestStructure ($advert) {
+    private function testQuestionsStructure ($questions) {
 
-        if (!is_array($advert)) {
-            return false;
-        }
-
-        $keys = ['title', 'description', 'contract', 'tags', 'requirements', 'place'];
-        foreach ($keys as $key) {
-            if (!key_exists($key, $advert)) {
-                return false;
-            }
-        }
-
-        if (!is_string($advert['title'])
-            || !is_string($advert['contract'])
-            || strlen($advert['contract']) > Advert::contractLenght
-            || strlen($advert['title']) > Advert::titleLength
-            || !is_array($advert['tags'])
-            || !is_array($advert['requirements'])
-        ){
-            return false;
-        }
-
-        $keys = ['formatted_address', 'lat', 'lon'];
-        foreach ($keys as $key) {
-            if (!key_exists($key, $advert['place'])) {
-                return false;
-            }
-        }
-        if (!is_string($advert['place']['formatted_address'])
-            || !filter_var($advert['place']['lat'], FILTER_VALIDATE_FLOAT)
-            || !filter_var($advert['place']['lon'], FILTER_VALIDATE_FLOAT)
-            || abs(filter_var($advert['place']['lat'], FILTER_VALIDATE_FLOAT))>90
-            || abs(filter_var($advert['place']['lon'], FILTER_VALIDATE_FLOAT))>180
-        ){
-            return false;
-        }
-
-        return true;
-
-    }
-
-    private function testQuestionsRequestStructure ($questions) {
         if (!is_array($questions)) {
             return false;
         }
 
-        foreach ($questions as $question){
-            if (!key_exists('type', $question)) {
+        foreach ($questions as $question) {
+            $result  = Question::testStructure($question);
+            if (!$result) {
                 return false;
-            }
-
-            switch ($question['type']) {
-                case 0:
-                case 1:
-                case 2:
-                    $keys = ['label', 'options'];
-                    foreach ($keys as $key) {
-                        if (!key_exists($key, $question)) {
-                            return false;
-                        }
-                    }
-
-                    if (!is_array($question['options']) || count($question['options']) < 2){
-                        return false;
-                    }
-
-                    foreach ($question['options'] as $option) {
-                        $keys = ['label', 'value', 'rank'];
-                        foreach ($keys as $key) {
-                            if (!key_exists($key, $option)) {
-                                return false;
-                            }
-                        }
-                    }
-                    break;
             }
         }
 
         return true;
 
-    }
-
-    private function constructQuestionsDatas ($question) {
-        $datas = [];
-        switch ($question['type']) {
-            case 0:
-            case 1:
-            case 2:
-                $datas = [
-                    'label' => $question['label'],
-                    'options' => $question['options']
-                ];
-                break;
-        }
-
-        return $datas;
     }
 }

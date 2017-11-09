@@ -1,0 +1,24 @@
+[
+  {
+    "type": 1,
+    "datas": {
+      "label": "public question 1",
+      "options": [
+        {"label": "opt1", "value": 0, "rank": []},
+        {"label": "opt2", "value": 1, "rank": []},
+        {"label": "opt3", "value": 2, "rank": []}
+      ]
+    }
+  },
+  {
+    "type": 0,
+    "datas": {
+      "label": "public question 2",
+      "options": [
+        {"label": "opt10", "value": 0, "rank": []},
+        {"label": "opt20", "value": 1, "rank": []},
+        {"label": "opt30", "value": 2, "rank": []}
+      ]
+    }
+  }
+]
