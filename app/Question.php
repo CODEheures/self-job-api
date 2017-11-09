@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\App;
 
 class Question extends Model
 {
@@ -208,12 +209,16 @@ class Question extends Model
 
     public static function getPublicDatasLibrary() {
         $publicQuestions = [];
-        $jsonQuestions =  json_decode(file_get_contents(__DIR__ . '/Common/publicLibrary.json'),true);
-        foreach ($jsonQuestions as $jsonQuestion) {
-            $publicQuestion = new Question();
-            $publicQuestion->datas = $jsonQuestion['datas'];
-            $publicQuestion->type = $jsonQuestion['type'];
-            $publicQuestions[] = $publicQuestion->makeVisible('datas');
+
+        $file = __DIR__ . '/Common/publicLibrary/'. App::getLocale() . '.json';
+        if (file_exists($file)) {
+            $jsonQuestions =  json_decode(file_get_contents($file),true);
+            foreach ($jsonQuestions as $jsonQuestion) {
+                $publicQuestion = new Question();
+                $publicQuestion->datas = $jsonQuestion['datas'];
+                $publicQuestion->type = $jsonQuestion['type'];
+                $publicQuestions[] = $publicQuestion->makeVisible('datas');
+            }
         }
         return $publicQuestions;
     }
