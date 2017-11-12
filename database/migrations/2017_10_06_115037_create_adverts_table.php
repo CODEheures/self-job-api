@@ -25,6 +25,7 @@ class CreateAdvertsTable extends Migration
             $table->text('tags')->nullable()->default(null);
             $table->text('requirements')->nullable()->default(null);
             $table->string('contract', \App\Advert::contractLenght)->nullable()->default(null);
+            $table->string('pictureUrl')->nullable()->default(null);
             //relations
             $table->integer('user_id')->unsigned()->index();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

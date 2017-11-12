@@ -12,7 +12,7 @@ class UserController extends Controller
 
 
     public function getUser() {
-        $user = Auth::user()->only(['name', 'email', 'pref_language', 'company']);
+        $user = Auth::user()->only(['name', 'email', 'pref_language', 'company', 'pictureUrl']);
         return response()->json($user);
     }
 

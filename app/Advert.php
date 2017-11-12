@@ -22,7 +22,7 @@ class Advert extends Model
      */
     protected $fillable = [
         'documentIndex', 'title', 'description', 'location', 'formatted_address', 'tags',
-        'requirements', 'contract', 'user_id'
+        'requirements', 'contract', 'pictureUrl', 'user_id'
     ];
 
     /**

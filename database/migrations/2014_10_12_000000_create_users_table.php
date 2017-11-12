@@ -24,6 +24,7 @@ class CreateUsersTable extends Migration
             $table->string('contact')->nullable()->default(null);
             $table->string('password');
             $table->string('pref_language',4)->nullable()->default(null);
+            $table->string('pictureUrl')->nullable()->default(null);
         });
     }
 
