@@ -53,7 +53,7 @@ class Question extends Model
 
     //relations
     public function advert() { return $this->belongsTo(Advert::class); }
-    public function answers() { return $this->belongsTo(Answer::class); }
+    public function answers() { return $this->hasMany(Answer::class); }
 
     // Getters
     public function getFormAttribute() {

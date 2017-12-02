@@ -51,12 +51,14 @@ class Advert extends Model
     ];
 
     private $mileage = 0;
+    private $responses_count = 0;
 
     //Relations
     public function user() { return $this->belongsTo(User::class); }
     public function questions() { return $this->hasMany(Question::class); }
+    public function answers() { return $this->hasManyThrough(Answer::class, Question::class); }
 
-    protected $appends = array('mileage');
+    protected $appends = array('mileage', 'responses_count');
 
     //Searchable elastic search attributes
     public $searchable = ['title', 'description', 'location', 'tags', 'requirements', 'contract'];
@@ -83,6 +85,10 @@ class Advert extends Model
         return $this->mileage;
     }
 
+    public function getResponsesCountAttribute() {
+        return $this->responses_count;
+    }
+
     //public function
     public function setMileage($latitude = null, $longitude = null){
         //latitude l longitutde L
@@ -101,6 +107,16 @@ class Advert extends Model
             $L = $S*6378137;
 
             $this->mileage = (int)($L/1000);
+        }
+    }
+
+    public function setResponsesCount(){
+        $questionsCount = $this->questions()->count();
+        if ($questionsCount > 0) {
+            $answersCount = $this->answers()->count();
+            $this->responses_count = (int)($questionsCount/$questionsCount);
+        } else {
+            $this->responses_count = '?';
         }
     }
 
