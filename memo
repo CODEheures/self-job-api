@@ -21,3 +21,10 @@ Run a mapping
 oauth API
 =========
 generate keys
+
+
+ECHO: redis + laravelecho-server
+=====
+apt-get install redis-server
+npm install -g laravel-echo-server
+laravel-echo-server init

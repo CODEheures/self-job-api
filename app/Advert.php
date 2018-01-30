@@ -3,6 +3,7 @@
 namespace App;
 
 use Carbon\Carbon;
+use Illuminate\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Iatstuti\Database\Support\CascadeSoftDeletes;
@@ -132,11 +133,12 @@ class Advert extends Model
     }
 
     public function isAccessibleByAuth () {
-        return
-            auth()->check() &&
-            ($this->user->id === auth()->user()->id ||
-                (!$this->is_internal_private && $this->company_id === auth()->user()->company_id)
-            );
+        return auth()->check() && $this->isAccessibleByUser(auth()->user());
+    }
+
+    public function isAccessibleByUser ($user) {
+        return $this->user->id === $user->id ||
+            (!$this->is_internal_private && $this->company_id === $user->company_id);
     }
     //public statics tools function
     public static function testStructure($advert) {

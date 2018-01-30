@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Advert;
 use App\Answer;
+use App\Events\NewAnswerEvent;
 use App\Http\Requests\QuizAnswersRequest;
 use App\Question;
 use Illuminate\Http\Request;
@@ -81,6 +82,10 @@ class QuestionController extends Controller
                 'phone' => $request->phone,
                 'advert_id' => $advert->id
             ]);
+
+            // Broadcast the number of answers
+            $newAnswerEvent = new NewAnswerEvent($advert->id, $advert->answers()->count());
+            broadcast($newAnswerEvent);
 
             return response()->json($finalScore);
         } else {
