@@ -114,7 +114,9 @@ class QuestionController extends Controller
         $corporatesQuestions = Question::corporateLibrary()->select('type', 'library_type', 'datas', 'md5')->get();
         $corporates = array_merge([], $corporatesQuestions->makeVisible('datas')->unique('md5')->toArray());
 
-        $publics = Question::getPublicDatasLibrary();
+        $publicsQuestions = Question::publicLibrary()->select('type', 'library_type', 'datas', 'md5')->get();
+        $publicsStatics = Question::getPublicDatasLibrary();
+        $publics = array_merge([], $publicsQuestions->makeVisible('datas')->unique('md5')->toArray(), $publicsStatics);
 
         return response()->json([
             'news' => $news,
@@ -143,5 +145,24 @@ class QuestionController extends Controller
         $proxy = Request::create(route('getLibrary',[],false), 'GET');
         $response = Route::dispatch($proxy);
         return $response;
+    }
+
+    /**
+     *
+     * Remove one question of private user questions list
+     *
+     * @param Request $request
+     * @return mixed
+     */
+    public function typeOfLibrary(Request $request) {
+        if ($request->filled('md5') && $request->filled('type') && is_int(filter_var($request->type, FILTER_VALIDATE_INT))){
+            $privateQuestions = Question::mines()->where('md5', $request->md5)->get();
+            foreach ($privateQuestions as $privateQuestion) {
+                $privateQuestion->library_type = $request->type;
+                $privateQuestion->save();
+            }
+            return response()->json('ok', 200);
+        }
+        return response()->json('ko', 409);
     }
 }

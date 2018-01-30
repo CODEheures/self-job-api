@@ -73,6 +73,9 @@ Route::middleware('throttle:60')->group(function () {
         // Remove a private question of a library
         Route::put('question/library/remove', 'Api\QuestionController@removeOfLibrary');
 
+        // Change library type of question
+        Route::put('question/library/type', 'Api\QuestionController@typeOfLibrary');
+
         //Pictures
         Route::group(['prefix' => 'picture'] , function () {
             Route::post('/', 'Api\PictureController@post');

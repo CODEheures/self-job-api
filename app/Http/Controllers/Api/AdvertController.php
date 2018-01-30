@@ -278,7 +278,7 @@ class AdvertController extends Controller
     }
 
     public function publishAdvert(Request $request) {
-        if ($request->filled('id') && $request->filled('publish') && filter_var($request->id, FILTER_VALIDATE_INT) && is_bool($request->publish)) {
+        if ($request->filled('id') && $request->filled('publish') && is_int(filter_var($request->id, FILTER_VALIDATE_INT)) && is_bool($request->publish)) {
             $advert = Advert::find($request->id);
             if ($advert && $advert->isAccessibleByAuth()) {
                 $advert->is_publish = $request->publish;
@@ -292,7 +292,7 @@ class AdvertController extends Controller
 
     public function deleteAdvert(Request $request) {
 
-        if ($request->filled('id') && filter_var($request->id, FILTER_VALIDATE_INT)){
+        if ($request->filled('id') && is_int(filter_var($request->id, FILTER_VALIDATE_INT))){
             $advert = Advert::find($request->id);
             if ($advert && auth()->user()->id == $advert->user->id) {
                 $advert->delete();

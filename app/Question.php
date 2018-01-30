@@ -99,8 +99,13 @@ class Question extends Model
     }
 
     public function scopeCorporates($query) {
-        return $query->where('library_type', 1)
+        return $query->whereIn('library_type', [1, 2])
             ->where('company_id', auth()->user()->company_id)
+            ->where('user_id', '<>', auth()->user()->id);
+    }
+
+    public function scopePublics($query) {
+        return $query->where('library_type', 2)
             ->where('user_id', '<>', auth()->user()->id);
     }
 
@@ -110,6 +115,10 @@ class Question extends Model
 
     public function scopeCorporateLibrary($query) {
         return $query->inLibrary()->corporates();
+    }
+
+    public function scopePublicLibrary($query) {
+        return $query->inLibrary()->publics();
     }
 
     //public tools functions
