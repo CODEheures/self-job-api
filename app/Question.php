@@ -10,11 +10,27 @@ class Question extends Model
 {
     use SoftDeletes;
 
+    /**
+     * Types
+     * 0: radio choice
+     * 1: checkbox choice
+     * 2: ordered list
+     *
+     */
     const TYPES = [0,1,2];
+
+    /**
+     * Library Type
+     * 0: private auth
+     * 1: private company
+     * 2: public
+     *
+     */
+    const LIBRARY_TYPES = [0,1,2];
 
 
     protected $fillable = [
-        'type', 'order', 'datas', 'md5', 'inLibrary', 'advert_id'
+        'type', 'order', 'datas', 'md5', 'inLibrary', 'library_type', 'company_id', 'user_id', 'advert_id'
     ];
 
     /**
@@ -53,7 +69,8 @@ class Question extends Model
 
     //relations
     public function advert() { return $this->belongsTo(Advert::class); }
-    public function answers() { return $this->hasMany(Answer::class); }
+    public function user() { return $this->belongsTo(User::class); }
+    public function company() { return $this->belongsTo(Company::class); }
 
     // Getters
     public function getFormAttribute() {
@@ -70,6 +87,29 @@ class Question extends Model
                 return null;
         }
         return $form;
+    }
+
+    //Scope
+    public function scopeInLibrary($query) {
+        return $query->where('inLibrary', true);
+    }
+
+    public function scopeMines($query) {
+        return $query->where('user_id', auth()->user()->id);
+    }
+
+    public function scopeCorporates($query) {
+        return $query->where('library_type', 1)
+            ->where('company_id', auth()->user()->company_id)
+            ->where('user_id', '<>', auth()->user()->id);
+    }
+
+    public function scopePrivateLibrary($query) {
+        return $query->inLibrary()->mines();
+    }
+
+    public function scopeCorporateLibrary($query) {
+        return $query->inLibrary()->corporates();
     }
 
     //public tools functions
@@ -217,6 +257,7 @@ class Question extends Model
                 $publicQuestion = new Question();
                 $publicQuestion->datas = $jsonQuestion['datas'];
                 $publicQuestion->type = $jsonQuestion['type'];
+                $publicQuestion->library_type = 2;
                 $publicQuestions[] = $publicQuestion->makeVisible('datas');
             }
         }

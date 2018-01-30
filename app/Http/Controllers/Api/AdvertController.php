@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
 
 class AdvertController extends Controller
 {
@@ -21,32 +23,43 @@ class AdvertController extends Controller
             $language = $request->language;
 
             if (Advert::testStructure($advert) && $this->testQuestionsStructure($questions)) {
+                DB::beginTransaction();
+                try {
+                    $newAdvert = new Advert();
+                    $newAdvert->documentIndex = Advert::rootElasticIndex . $language;
+                    $newAdvert->title = $advert['title'];
+                    $newAdvert->description = $advert['description'];
+                    $newAdvert->user_id = auth()->id();
+                    $newAdvert->company_id = auth()->user()->company_id;
+                    $newAdvert->location = ['lat' => $advert['place']['lat'], 'lon' => $advert['place']['lon']];
+                    $newAdvert->formatted_address = $advert['place']['formatted_address'];
+                    $newAdvert->tags = $advert['tags'];
+                    $newAdvert->requirements = $advert['requirements'];
+                    $newAdvert->contract = $advert['contract'];
+                    $newAdvert->pictureUrl = auth()->user()->pictureUrl;
+                    $newAdvert->is_publish = false;
+                    $newAdvert->save();
 
-                $newAdvert = new Advert();
-                $newAdvert->documentIndex = Advert::rootElasticIndex . $language;
-                $newAdvert->title = $advert['title'];
-                $newAdvert->description = $advert['description'];
-                $newAdvert->user_id = auth()->id();
-                $newAdvert->location = ['lat' => $advert['place']['lat'], 'lon' => $advert['place']['lon']];
-                $newAdvert->formatted_address = $advert['place']['formatted_address'];
-                $newAdvert->tags = $advert['tags'];
-                $newAdvert->requirements = $advert['requirements'];
-                $newAdvert->contract = $advert['contract'];
-                $newAdvert->pictureUrl = auth()->user()->pictureUrl;
-                $newAdvert->save();
-
-                $user = auth()->user();
-                $user->pictureUrl = null;
-                $user->save();
+                    $user = auth()->user();
+                    $user->pictureUrl = null;
+                    $user->save();
 
 
-                foreach ($questions as $index => $question) {
-                    $newQuestion = new Question();
-                    $newQuestion->type = $question['type'];
-                    $newQuestion->order = $index;
-                    $newQuestion->datas = $question['datas'];
-                    $newQuestion->advert_id = $newAdvert->id;
-                    $newQuestion->save();
+                    foreach ($questions as $index => $question) {
+                        $newQuestion = new Question();
+                        $newQuestion->type = $question['type'];
+                        $newQuestion->order = $index;
+                        $newQuestion->datas = $question['datas'];
+                        $newQuestion->advert_id = $newAdvert->id;
+                        $newQuestion->user_id = auth()->id();
+                        $newQuestion->company_id = auth()->user()->id;
+                        $newQuestion->save();
+                    }
+
+                    DB::commit();
+                } catch (\Exception $e) {
+                    DB::rollback();
+                    return response('ko', 422);
                 }
 
                 return response('ok', 200);
@@ -62,7 +75,6 @@ class AdvertController extends Controller
     }
 
     public function getAdverts(Request $request) {
-
         $adverts = [];
 
         $size = 4;
@@ -133,6 +145,7 @@ class AdvertController extends Controller
         if ($search && $location && $mileage & !$isStopMileage){
             $results = Advert::search()
                 ->index(Advert::rootElasticIndex . App::getLocale())
+                ->must()->term('is_publish', true)
                 ->multiMatch(['title', 'title.stemmed', 'description', 'description.stemmed', 'tags', 'tags.stemmed', 'requirements', 'requirements.stemmed', 'contract', 'contract.stemmed'], $search, ['fuzziness'=>'AUTO'])
                 ->geoDistance('location', $request->mileage['max'].'km', $request->location)
                 ->from($from)
@@ -144,6 +157,7 @@ class AdvertController extends Controller
         if ($search && $location && $mileage & $isStopMileage){
             $results = Advert::search()
                 ->index(Advert::rootElasticIndex . App::getLocale())
+                ->must()->term('is_publish', true)
                 ->multiMatch(['title', 'title.stemmed', 'description', 'description.stemmed', 'tags', 'tags.stemmed', 'requirements', 'requirements.stemmed', 'contract', 'contract.stemmed'], $search, ['fuzziness'=>'AUTO'])
                 ->from($from)
                 ->size($size)
@@ -154,6 +168,7 @@ class AdvertController extends Controller
         if ($search && (is_null($location) || is_null($mileage))){
             $results = Advert::search()
                 ->index(Advert::rootElasticIndex . App::getLocale())
+                ->must()->term('is_publish', true)
                 ->multiMatch(['title', 'title.stemmed', 'description', 'description.stemmed', 'tags', 'tags.stemmed', 'requirements', 'requirements.stemmed', 'contract', 'contract.stemmed'], $search, ['fuzziness' => 'AUTO'])
                 ->from($from)
                 ->size($size)
@@ -167,6 +182,7 @@ class AdvertController extends Controller
             $results = Advert::search()
                 ->index(Advert::rootElasticIndex . App::getLocale())
                 ->matchAll()
+                ->must()->term('is_publish', true)
                 ->geoDistance('location', $request->mileage['max'].'km', $request->location)
                 ->sortBy('_geo_distance', 'asc', ['location' => $request->location])
                 ->from($from)
@@ -179,6 +195,7 @@ class AdvertController extends Controller
             $results = Advert::search()
                 ->index(Advert::rootElasticIndex . App::getLocale())
                 ->matchAll()
+                ->must()->term('is_publish', true)
                 ->sortBy('_geo_distance', 'asc', ['location' => $request->location])
                 ->from($from)
                 ->size($size)
@@ -190,6 +207,7 @@ class AdvertController extends Controller
             $results = Advert::search()
                 ->index(Advert::rootElasticIndex . App::getLocale())
                 ->matchAll()
+                ->must()->term('is_publish', true)
                 ->from($from)
                 ->size($size)
                 ->get();
@@ -199,8 +217,8 @@ class AdvertController extends Controller
 
         // Transform in a new collection and get users informations
         $adverts = new Collection($results->hits());
-        $adverts->load(['user' => function ($query) {
-            $query->select(['id','company','contact']);
+        $adverts->load(['company' => function ($query) {
+            $query->select(['id','name']);
         }]);
 
         // Set the mileage and unset minimum mileage request
@@ -223,8 +241,8 @@ class AdvertController extends Controller
         $advert = Advert::find($id);
 
         if($advert) {
-            $advert->load(['user' => function ($query) {
-                $query->select(['id','company','contact']);
+            $advert->load(['company' => function ($query) {
+                $query->select(['id','name']);
             }]);
             return response()->json($advert);
         } else {
@@ -236,11 +254,53 @@ class AdvertController extends Controller
 
     public function getMyAdverts() {
 
-        $adverts = Advert::with('user')->where('user_id', auth()->id())->get();
+        $adverts = Advert::with('user')->where('user_id', auth()->id())->orWhere(function ($query) {
+            $query->where('company_id', auth()->user()->company_id)->where('is_internal_private', false);
+        })->get();
+
         foreach ($adverts as $advert) {
             $advert->setResponsesCount();
+            $advert->setIsUpdatable();
         }
         return response()->json($adverts);
+
+
+    }
+
+    public function getAdvertAnswers($id) {
+
+        $answers = null;
+        $advert = Advert::with('answers')->find($id);
+        if ($advert && $advert->isAccessibleByAuth()){
+            $answers = $advert->answers()->orderBy('score', 'DESC')->oldest()->get();
+        }
+        return response()->json($answers);
+    }
+
+    public function publishAdvert(Request $request) {
+        if ($request->filled('id') && $request->filled('publish') && filter_var($request->id, FILTER_VALIDATE_INT) && is_bool($request->publish)) {
+            $advert = Advert::find($request->id);
+            if ($advert && $advert->isAccessibleByAuth()) {
+                $advert->is_publish = $request->publish;
+                $advert->save();
+            }
+        }
+        $proxy = Request::create(route('getMyAdverts',[],false), 'GET');
+        $response = Route::dispatch($proxy);
+        return $response;
+    }
+
+    public function deleteAdvert(Request $request) {
+
+        if ($request->filled('id') && filter_var($request->id, FILTER_VALIDATE_INT)){
+            $advert = Advert::find($request->id);
+            if ($advert && auth()->user()->id == $advert->user->id) {
+                $advert->delete();
+            }
+        }
+        $proxy = Request::create(route('getMyAdverts',[],false), 'GET');
+        $response = Route::dispatch($proxy);
+        return $response;
 
 
     }

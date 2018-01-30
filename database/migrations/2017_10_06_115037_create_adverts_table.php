@@ -26,9 +26,13 @@ class CreateAdvertsTable extends Migration
             $table->text('requirements')->nullable()->default(null);
             $table->string('contract', \App\Advert::contractLenght)->nullable()->default(null);
             $table->string('pictureUrl')->nullable()->default(null);
+            $table->boolean('is_internal_private')->default(false);
+            $table->boolean('is_publish')->default(false);
             //relations
             $table->integer('user_id')->unsigned()->index();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->integer('company_id')->unsigned()->index();
+            $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
         });
     }
 

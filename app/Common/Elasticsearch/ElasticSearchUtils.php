@@ -122,7 +122,7 @@ trait ElasticSearchUtils {
                 return true;
             }
         }
-        return $response;
+        return true;
     }
 
     /**

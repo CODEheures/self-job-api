@@ -12,31 +12,72 @@ use Illuminate\Http\Request;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::get('test', 'Api\TestController@test');
 
-Route::post('register', 'Api\Auth\OAuthController@register');
-Route::post('login', 'Api\Auth\OAuthController@login');
-Route::post('refresh', 'Api\Auth\OAuthController@refresh');
-Route::get('existUser', 'Api\UserController@exist');
-Route::post('getAdverts', 'Api\AdvertController@getAdverts');
-Route::get('advert/{id}', 'Api\AdvertController@show');
-Route::get('quiz/{advertId}', 'Api\QuestionController@quiz');
+/**
+ *
+ * In this API user is only employers
+ *
+ */
 
-Route::middleware('auth:api')->group(function () {
-    Route::post('logout', 'Api\Auth\OAuthController@logout');
+// Post quiz answers of an advert
+Route::post('quiz', 'Api\QuestionController@quizAnswers')->middleware('throttle:60');
 
-    Route::get('user', 'Api\UserController@getUser');
-    Route::post('user/set', 'Api\UserController@setProperty');
+// Get the quiz (questions list) of an advert
+Route::get('quiz/{advertId}', 'Api\QuestionController@quiz')->middleware('throttle:60');
 
-    Route::get('myAdverts', 'Api\AdvertController@getMyAdverts');
-    Route::post('advert', 'Api\AdvertController@postAdvert');
-    Route::get('question/library', 'Api\QuestionController@getLibrary');
-    Route::put('question/library/remove', 'Api\QuestionController@removeOfLibrary');
 
-    //Pictures
-    Route::group(['prefix' => 'picture'] , function () {
-        Route::post('/', 'Api\PictureController@post');
-        Route::delete('/', 'Api\PictureController@destroy');
+
+// Accepted high request throttle
+Route::middleware('throttle:60')->group(function () {
+    // Route for development tests
+    Route::get('test', 'Api\TestController@test');
+
+    // Get list of adverts: return the search
+    Route::post('getAdverts', 'Api\AdvertController@getAdverts');
+
+    // Show an advert
+    Route::get('advert/{id}', 'Api\AdvertController@show');
+
+
+
+    // Auth routes
+    Route::post('register', 'Api\Auth\OAuthController@register');
+    Route::post('login', 'Api\Auth\OAuthController@login');
+    Route::post('refresh', 'Api\Auth\OAuthController@refresh');
+    Route::get('existUser', 'Api\UserController@exist');
+    Route::middleware('auth:api')->group(function () {
+
+        // GET, SET and LOGOUT user
+        Route::get('user', 'Api\UserController@getUser');
+        Route::post('user/set', 'Api\UserController@setProperty');
+        Route::post('logout', 'Api\Auth\OAuthController@logout');
+
+        // Get list of user advert
+        Route::get('myAdverts', 'Api\AdvertController@getMyAdverts')->name('getMyAdverts');
+
+        // Get list of answer of an advert
+        Route::get('advert/answers/{id}', 'Api\AdvertController@getAdvertAnswers');
+
+        // Post an advert
+        Route::post('advert', 'Api\AdvertController@postAdvert');
+
+        // Publish/unPublish an advert
+        Route::put('advert/publish', 'Api\AdvertController@publishAdvert');
+
+        // Delete an advert
+        Route::delete('advert', 'Api\AdvertController@deleteAdvert');
+
+        // Get the questions library (new, private, public)
+        Route::get('question/library', 'Api\QuestionController@getLibrary')->name('getLibrary');
+
+        // Remove a private question of a library
+        Route::put('question/library/remove', 'Api\QuestionController@removeOfLibrary');
+
+        //Pictures
+        Route::group(['prefix' => 'picture'] , function () {
+            Route::post('/', 'Api\PictureController@post');
+            Route::delete('/', 'Api\PictureController@destroy');
+        });
+
     });
-
 });

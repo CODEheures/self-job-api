@@ -22,7 +22,7 @@ class Advert extends Model
      */
     protected $fillable = [
         'documentIndex', 'title', 'description', 'location', 'formatted_address', 'tags',
-        'requirements', 'contract', 'pictureUrl', 'user_id'
+        'requirements', 'contract', 'pictureUrl', 'is_internal_private', 'is_publish', 'company_id', 'user_id'
     ];
 
     /**
@@ -52,16 +52,19 @@ class Advert extends Model
 
     private $mileage = 0;
     private $responses_count = 0;
+    private $is_updatable = false;
+    private $is_deletable = true;
 
     //Relations
+    public function company() { return $this->belongsTo(Company::class); }
     public function user() { return $this->belongsTo(User::class); }
     public function questions() { return $this->hasMany(Question::class); }
-    public function answers() { return $this->hasManyThrough(Answer::class, Question::class); }
+    public function answers() { return $this->hasMany(Answer::class); }
 
-    protected $appends = array('mileage', 'responses_count');
+    protected $appends = array('mileage', 'responses_count', 'is_updatable', 'is_deletable');
 
     //Searchable elastic search attributes
-    public $searchable = ['title', 'description', 'location', 'tags', 'requirements', 'contract'];
+    public $searchable = ['title', 'description', 'location', 'tags', 'requirements', 'contract', 'is_publish'];
 
 
     //Build document response for elastic
@@ -69,12 +72,14 @@ class Advert extends Model
         return [
             'id' => $this->id,
             'user_id' => $this->user_id,
+            'company_id' => $this->company_id,
             'title' => $this->title,
             'description' => $this->description,
             'tags' => $this->tags,
             'requirements' => $this->requirements,
             'contract' => $this->contract,
             'location' => $this->location,
+            'is_publish' => $this->is_publish,
             'created' => Carbon::parse($this->created_at)->toDateTimeString()
         ];
     }
@@ -87,6 +92,14 @@ class Advert extends Model
 
     public function getResponsesCountAttribute() {
         return $this->responses_count;
+    }
+
+    public function getIsUpdatableAttribute() {
+        return $this->is_updatable;
+    }
+
+    public function getIsDeletableAttribute() {
+        return $this->is_deletable;
     }
 
     //public function
@@ -111,15 +124,20 @@ class Advert extends Model
     }
 
     public function setResponsesCount(){
-        $questionsCount = $this->questions()->count();
-        if ($questionsCount > 0) {
-            $answersCount = $this->answers()->count();
-            $this->responses_count = (int)($questionsCount/$questionsCount);
-        } else {
-            $this->responses_count = '?';
-        }
+        $this->responses_count = $this->answers()->count();
     }
 
+    public function setIsUpdatable() {
+        $this->is_updatable = $this->responses_count == 0;
+    }
+
+    public function isAccessibleByAuth () {
+        return
+            auth()->check() &&
+            ($this->user->id === auth()->user()->id ||
+                (!$this->is_internal_private && $this->company_id === auth()->user()->company_id)
+            );
+    }
     //public statics tools function
     public static function testStructure($advert) {
         if (!is_array($advert)) {

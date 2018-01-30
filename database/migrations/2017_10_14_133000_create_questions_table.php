@@ -22,9 +22,14 @@ class CreateQuestionsTable extends Migration
             $table->text('datas');
             $table->string('md5', 32);
             $table->boolean('inLibrary')->default(true);
+            $table->tinyInteger('library_type')->default(1);
             //relations
             $table->integer('advert_id')->unsigned()->index();
             $table->foreign('advert_id')->references('id')->on('adverts')->onDelete('cascade');
+            $table->integer('user_id')->unsigned()->index();
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->integer('company_id')->unsigned()->index();
+            $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
         });
     }
 

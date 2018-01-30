@@ -12,8 +12,12 @@ class UserController extends Controller
 
 
     public function getUser() {
-        $user = Auth::user()->only(['name', 'email', 'pref_language', 'company', 'pictureUrl']);
-        return response()->json($user);
+        $user = Auth::user();
+        $user->load(['company' => function ($query) {
+            $query->select(['id', 'name']);
+        }]);
+        $result = $user->only(['name', 'email', 'pref_language', 'pictureUrl', 'company']);
+        return response()->json($result);
     }
 
     public function exist(Request $request) {

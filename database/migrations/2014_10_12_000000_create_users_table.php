@@ -20,11 +20,14 @@ class CreateUsersTable extends Migration
             $table->rememberToken();
             $table->string('name');
             $table->string('email')->unique();
-            $table->string('company')->nullable()->default(null);
             $table->string('contact')->nullable()->default(null);
             $table->string('password');
             $table->string('pref_language',4)->nullable()->default(null);
             $table->string('pictureUrl')->nullable()->default(null);
+
+            //relations
+            $table->integer('company_id')->unsigned()->index();
+            $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
         });
     }
 

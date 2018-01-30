@@ -18,7 +18,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password','pref_language', 'compagny', 'contact'
+        'name', 'email', 'password','pref_language', 'contact', 'company_id'
     ];
 
     /**
@@ -45,6 +45,7 @@ class User extends Authenticatable
     protected $cascadeDeletes = ['adverts'];
 
     //relations
+    public function company() { return $this->belongsTo(Company::class); }
     public function adverts() { return $this->hasMany(Advert::class); }
-    public function questions() { return $this->hasManyThrough(Question::class, Advert::class); }
+    public function questions() { return $this->hasMany(Question::class); }
 }

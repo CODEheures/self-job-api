@@ -1,6 +1,12 @@
 elasticsearch
 =================
 
+// pour voir l'etat elasticsearch
+https://github.com/mobz/elasticsearch-head
+installation de l'extension chrome est le plus simple
+
+
+// ,icu pour analyse langue unicode
 install:https://www.elastic.co/guide/en/elasticsearch/plugins/current/analysis-icu.html
 
 install analysis-icu:

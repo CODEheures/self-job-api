@@ -53,6 +53,9 @@
     "location": {
       "type": "geo_point"
     },
+    "is_publish": {
+      "type": "boolean"
+    },
     "created": {
       "type":   "date",
       "format": "yyyy-MM-dd HH:mm:ss"
