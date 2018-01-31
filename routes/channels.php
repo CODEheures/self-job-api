@@ -19,3 +19,7 @@ Broadcast::channel('new-answer-on.{id}', function ($user, $id) {
     $advert = \App\Advert::find($id);
     return ($advert && $advert->isAccessibleByUser($user));
 });
+
+Broadcast::channel('update-adverts-for-company.{id}', function ($user, $id) {
+   return  (int)$user->company_id === (int)$id;
+});

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Advert;
+use App\Events\UpdateAdvertEvent;
 use App\Question;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
@@ -57,6 +58,11 @@ class AdvertController extends Controller
                     }
 
                     DB::commit();
+
+                    // Broadcast the new advert
+                    $newAdvertEvent = new UpdateAdvertEvent($user->company_id);
+                    broadcast($newAdvertEvent);
+
                 } catch (\Exception $e) {
                     DB::rollback();
                     return response('ko', 422);
@@ -284,10 +290,15 @@ class AdvertController extends Controller
                 $advert->is_publish = $request->publish;
                 $advert->save();
             }
+            // Broadcast the new advert
+            $newAdvertEvent = new UpdateAdvertEvent($advert->company_id);
+            broadcast($newAdvertEvent);
+            return response()->json('ok', 200);
         }
-        $proxy = Request::create(route('getMyAdverts',[],false), 'GET');
-        $response = Route::dispatch($proxy);
-        return $response;
+//        $proxy = Request::create(route('getMyAdverts',[],false), 'GET');
+//        $response = Route::dispatch($proxy);
+        return response()->json('ko', 409);
+
     }
 
     public function deleteAdvert(Request $request) {
@@ -297,10 +308,14 @@ class AdvertController extends Controller
             if ($advert && auth()->user()->id == $advert->user->id) {
                 $advert->delete();
             }
+            // Broadcast the new advert
+            $newAdvertEvent = new UpdateAdvertEvent(auth()->user()->company_id);
+            broadcast($newAdvertEvent);
+            return response()->json('ok', 200);
         }
-        $proxy = Request::create(route('getMyAdverts',[],false), 'GET');
-        $response = Route::dispatch($proxy);
-        return $response;
+//        $proxy = Request::create(route('getMyAdverts',[],false), 'GET');
+//        $response = Route::dispatch($proxy);
+        return response()->json('ko', 409);
 
 
     }
