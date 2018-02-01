@@ -38,6 +38,7 @@ class AdvertController extends Controller
                     $newAdvert->requirements = $advert['requirements'];
                     $newAdvert->contract = $advert['contract'];
                     $newAdvert->pictureUrl = auth()->user()->pictureUrl;
+                    $newAdvert->is_internal_private = $advert['is_internal_private'];
                     $newAdvert->is_publish = false;
                     $newAdvert->save();
 

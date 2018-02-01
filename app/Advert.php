@@ -146,7 +146,7 @@ class Advert extends Model
             return false;
         }
 
-        $keys = ['title', 'description', 'contract', 'tags', 'requirements', 'place'];
+        $keys = ['title', 'description', 'contract', 'tags', 'requirements', 'place', 'is_internal_private'];
         foreach ($keys as $key) {
             if (!key_exists($key, $advert)) {
                 return false;
@@ -159,6 +159,7 @@ class Advert extends Model
             || strlen($advert['title']) > Advert::titleLength
             || !is_array($advert['tags'])
             || !is_array($advert['requirements'])
+            || !is_bool($advert['is_internal_private'])
         ){
             return false;
         }
