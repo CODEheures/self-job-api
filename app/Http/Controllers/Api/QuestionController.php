@@ -113,15 +113,15 @@ class QuestionController extends Controller
             ];
         }
 
-        $privatesQuestions = Question::privateLibrary()->select('type', 'library_type', 'datas', 'md5')->get();
-        $privates = array_merge([], $privatesQuestions->makeVisible('datas')->unique('md5')->toArray());
+        $privatesQuestions = Question::privateLibrary()->select('type', 'library_type', 'datas', 'hash')->get();
+        $privates = array_merge([], $privatesQuestions->makeVisible('datas')->unique('hash')->toArray());
 
-        $corporatesQuestions = Question::corporateLibrary()->select('type', 'library_type', 'datas', 'md5')->get();
-        $corporates = array_merge([], $corporatesQuestions->makeVisible('datas')->unique('md5')->toArray());
+        $corporatesQuestions = Question::corporateLibrary()->select('type', 'library_type', 'datas', 'hash')->get();
+        $corporates = array_merge([], $corporatesQuestions->makeVisible('datas')->unique('hash')->toArray());
 
-        $publicsQuestions = Question::publicLibrary()->select('type', 'library_type', 'datas', 'md5')->get();
+        $publicsQuestions = Question::publicLibrary()->select('type', 'library_type', 'datas', 'hash')->get();
         $publicsStatics = Question::getPublicDatasLibrary();
-        $publics = array_merge([], $publicsQuestions->makeVisible('datas')->unique('md5')->toArray(), $publicsStatics);
+        $publics = array_merge([], $publicsQuestions->makeVisible('datas')->unique('hash')->toArray(), $publicsStatics);
 
         return response()->json([
             'news' => $news,
@@ -140,8 +140,8 @@ class QuestionController extends Controller
      * @return mixed
      */
     public function removeOfLibrary(Request $request) {
-        if ($request->filled('md5')){
-            $privateQuestions = Question::mines()->where('md5', $request->md5)->get();
+        if ($request->filled('hash')){
+            $privateQuestions = Question::mines()->where('hash', $request->hash)->get();
             foreach ($privateQuestions as $privateQuestion) {
                 $privateQuestion->inLibrary = false;
                 $privateQuestion->save();
@@ -160,8 +160,8 @@ class QuestionController extends Controller
      * @return mixed
      */
     public function typeOfLibrary(Request $request) {
-        if ($request->filled('md5') && $request->filled('type') && is_int(filter_var($request->type, FILTER_VALIDATE_INT))){
-            $privateQuestions = Question::mines()->where('md5', $request->md5)->get();
+        if ($request->filled('hash') && $request->filled('type') && is_int(filter_var($request->type, FILTER_VALIDATE_INT))){
+            $privateQuestions = Question::mines()->where('hash', $request->hash)->get();
             foreach ($privateQuestions as $privateQuestion) {
                 $privateQuestion->library_type = $request->type;
                 $privateQuestion->save();

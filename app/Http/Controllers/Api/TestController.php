@@ -23,9 +23,25 @@ class TestController extends Controller
         //$var = $user->questions;
         //$var = $user->questions;
 
-        $advert = Advert::find(2);
-        $advert->is_publish = true;
-        $advert->save();
-        dd($advert);
+        $question = Question::first();
+        $time1 = microtime();
+        $md5 = md5(json_encode($question->datas));
+        $md5time = microtime();
+
+        $time2 = microtime();
+        $sha512 = hash('sha512', json_encode($question->datas));
+        $shatime = microtime();
+
+
+        dd([
+            'md5' => [
+                'hash' => $md5,
+                'time' => $md5time-$time1,
+            ],
+            'sha512' => [
+                'hash' => $sha512,
+                'time' => $shatime-$time2
+            ]
+        ]);
     }
 }

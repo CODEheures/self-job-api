@@ -30,7 +30,7 @@ class Question extends Model
 
 
     protected $fillable = [
-        'type', 'order', 'datas', 'md5', 'inLibrary', 'library_type', 'company_id', 'user_id', 'advert_id'
+        'type', 'order', 'datas', 'hash', 'inLibrary', 'library_type', 'company_id', 'user_id', 'advert_id'
     ];
 
     /**

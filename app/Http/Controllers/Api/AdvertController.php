@@ -10,7 +10,6 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Route;
 
 class AdvertController extends Controller
 {
@@ -307,6 +306,7 @@ class AdvertController extends Controller
         if ($request->filled('id') && is_int(filter_var($request->id, FILTER_VALIDATE_INT))){
             $advert = Advert::find($request->id);
             if ($advert && auth()->user()->id == $advert->user->id) {
+                //TODO delete picture
                 $advert->delete();
             }
             // Broadcast the new advert

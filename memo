@@ -28,3 +28,6 @@ ECHO: redis + laravelecho-server
 apt-get install redis-server
 npm install -g laravel-echo-server
 laravel-echo-server init
+laravel-echo-server-start
+
+installer supervisor pour relaunch 'laravel-echo server start' & 'service elastic search restart'

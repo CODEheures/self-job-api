@@ -20,7 +20,7 @@ class CreateQuestionsTable extends Migration
             $table->tinyInteger('type')->unsigned();
             $table->tinyInteger('order')->unsigned();
             $table->text('datas');
-            $table->string('md5', 32);
+            $table->string('hash', 128);
             $table->boolean('inLibrary')->default(true);
             $table->tinyInteger('library_type')->default(1);
             //relations

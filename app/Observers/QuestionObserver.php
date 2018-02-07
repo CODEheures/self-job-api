@@ -15,11 +15,11 @@ class QuestionObserver
      */
     public function creating(Question $question)
     {
-        $question->md5  = md5(json_encode($question->datas));
+        $question->hash  = hash('sha512', json_encode($question->datas));
     }
 
     public function saving(Question $question) {
-        $question->md5  = md5(json_encode($question->datas));
+        $question->hash  = hash('sha512', json_encode($question->datas));
     }
 
 }
