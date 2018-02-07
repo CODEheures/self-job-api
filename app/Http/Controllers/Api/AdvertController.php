@@ -51,6 +51,7 @@ class AdvertController extends Controller
                         $newQuestion->type = $question['type'];
                         $newQuestion->order = $index;
                         $newQuestion->datas = $question['datas'];
+                        $newQuestion->pref_language = $language;
                         $newQuestion->advert_id = $newAdvert->id;
                         $newQuestion->user_id = auth()->id();
                         $newQuestion->company_id = auth()->user()->id;

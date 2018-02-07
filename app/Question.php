@@ -106,6 +106,7 @@ class Question extends Model
 
     public function scopePublics($query) {
         return $query->where('library_type', 2)
+            ->where('pref_language', auth()->user()->pref_language)
             ->where('user_id', '<>', auth()->user()->id);
     }
 

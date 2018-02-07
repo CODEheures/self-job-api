@@ -23,6 +23,7 @@ class CreateQuestionsTable extends Migration
             $table->string('hash', 128);
             $table->boolean('inLibrary')->default(true);
             $table->tinyInteger('library_type')->default(1);
+            $table->string('pref_language',4)->nullable()->default(null);
             //relations
             $table->integer('advert_id')->unsigned()->index();
             $table->foreign('advert_id')->references('id')->on('adverts')->onDelete('cascade');

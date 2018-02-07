@@ -1,23 +1,36 @@
 [
   {
-    "type": 1,
+    "type": 0,
     "datas": {
-      "label": "public question 1",
+      "label": "Vous préférez",
       "options": [
-        {"label": "opt1", "value": 0, "rank": []},
-        {"label": "opt2", "value": 1, "rank": []},
-        {"label": "opt3", "value": 2, "rank": []}
+        {"label": "Les bananes", "value": 0, "rank": []},
+        {"label": "Les pommes", "value": 1, "rank": []},
+        {"label": "Les kiwis", "value": 2, "rank": []}
       ]
     }
   },
   {
-    "type": 0,
+    "type": 1,
     "datas": {
-      "label": "public question 2",
+      "label": "Vous aimez",
       "options": [
-        {"label": "opt10", "value": 0, "rank": []},
-        {"label": "opt20", "value": 1, "rank": []},
-        {"label": "opt30", "value": 2, "rank": []}
+        {"label": "La viande", "value": 0, "rank": []},
+        {"label": "Le poisson", "value": 1, "rank": []},
+        {"label": "Les légumes", "value": 2, "rank": []},
+        {"label": "Les plats cuisinés", "value": 2, "rank": []}
+      ]
+    }
+  },
+  {
+    "type": 2,
+    "datas": {
+      "label": "Classez ces qualités selon votre préférence",
+      "options": [
+        {"label": "Le courage", "rank": [4]},
+        {"label": "La patience", "rank": [2]},
+        {"label": "Le respect", "rank": [1]},
+        {"label": "La curiosité", "rank": [3]}
       ]
     }
   }
