@@ -4,6 +4,8 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
+use Sleimanx2\Plastic\Facades\Plastic;
 
 class Answer extends Model
 {
@@ -27,12 +29,11 @@ class Answer extends Model
     public static function calcScore ($answer, Question $question) {
 
         switch ($question->type) {
+            /**
+             * Radios list
+             * Score = Rank of checked option
+             */
             case 0:
-                /**
-                 * Radios list
-                 * Score = Rank of checked option
-                 */
-
                 if (!is_int($answer)) {
                     return null;
                 }
@@ -46,12 +47,12 @@ class Answer extends Model
                 return null;
 
                 break;
-            case 1:
-                /**
-                 * Checkbox list
-                 * Score = Sum of ranks of each checked checkbox
-                 */
 
+            /**
+             * Checkbox list
+             * Score = Sum of ranks of each checked checkbox
+             */
+            case 1:
                 if (!is_array($answer)) {
                     return null;
                 }
@@ -78,11 +79,13 @@ class Answer extends Model
                 return ['score' => $score, 'max' => $max];
 
                 break;
+
+            /**
+             * Compare 2 ordered lists
+             * Score = (Sum of indexes+1) - (Sum of distance of anwser item to options item)
+             */
             case 2:
-                /**
-                 * Compare 2 ordered lists
-                 * Score = (Sum of indexes+1) - (Sum of distance of anwser item to options item)
-                 */
+
 
                 if (!is_array($answer) || count($answer) !== count($question->datas->options)){
                     return null;
@@ -113,6 +116,45 @@ class Answer extends Model
                 $score = $sumOfIndexes - $sumOfDistance;
                 return ['score' => $score, 'max' => $sumOfIndexes];
 
+                break;
+
+            /**
+             * Compare text with wanted and unwanted terms
+             * Score =
+             */
+            case 3:
+
+                if (!is_string($answer)){
+                    return null;
+                }
+
+                $wantedSearch = trim(array_reduce($question->datas->wantedTerms,
+                    function ($carry, $item) {
+                        $carry .= (' ' . $item->label);
+                        return $carry;
+                    }
+                ));
+
+                $elasticScore3 = new Score3([
+                    'documentIndex' => Score3::rootElasticIndex . $question->pref_language,
+                    'description' => $answer
+                ]);
+                $elasticScore3->save();
+
+                //sleep(5);
+                $count = 0;
+                do {
+                    usleep(500000);
+                    $count++;
+                    $results = Score3::search()
+                        ->index(Score3::rootElasticIndex . $question->pref_language)
+                        ->must()->match('id', $elasticScore3->id)
+                        //->multiMatch(['description', 'description.stemmed'], $wantedSearch , ['fuzziness'=>'AUTO'])
+                        ->get();
+                } while ($results->totalHits() === 0 && $count < 10);
+
+
+                dd([$count, $results]);
                 break;
         }
 

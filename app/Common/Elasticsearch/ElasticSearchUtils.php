@@ -3,6 +3,7 @@
 namespace App\Common\Elasticsearch;
 
 use App\Advert;
+use App\Score3;
 use Carbon\Carbon;
 use GuzzleHttp\Client as GuzzleClient;
 use Illuminate\Database\Eloquent\Builder;
@@ -91,16 +92,16 @@ trait ElasticSearchUtils {
         return response($response->getBody()->getContents(), $response->getStatusCode());
     }
 
+
     /**
      * @param string $name
      * @param int $shards
      * @param int $replicas
      * @param string $analyser
      * @param string|null $mappingName
-     * @param Builder $documents
-     * @return bool|\Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
      */
-    public static function reIndex(string $name, int $shards, int $replicas, string $analyser, string $mappingName = null, Builder $documents) {
+    public static function reCreateIndex(string $name, int $shards, int $replicas, string $analyser, string $mappingName = null) {
 
         //1 DELETE INDEX
         self::deleteIndex($name);
@@ -113,7 +114,24 @@ trait ElasticSearchUtils {
             $response = self::createMapping($name, $analyser, $mappingName);
         }
 
-        //4 BULK SAVE FOR REINDEXING
+        return $response;
+    }
+
+    /**
+     * @param string $name
+     * @param int $shards
+     * @param int $replicas
+     * @param string $analyser
+     * @param string|null $mappingName
+     * @param Builder $documents
+     * @return bool|\Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+     */
+    public static function reIndex(string $name, int $shards, int $replicas, string $analyser, string $mappingName = null, Builder $documents) {
+
+        //1 Recreate Index
+        $response = self::reCreateIndex($name, $shards, $replicas, $analyser, $mappingName);
+
+        //2 BULK SAVE FOR REINDEXING
         if ($response->getStatusCode() == 200 && $documents->count() > 0) {
             $response = Plastic::persist()->bulkSave($documents->get());
             if ($response['errors']) {
@@ -131,7 +149,7 @@ trait ElasticSearchUtils {
     public static function reIndexAdverts() {
         set_time_limit(3600);
         foreach (config('app.availableLocales') as $locale) {
-            //Options
+            //Reindex Adverts
             $index = Advert::rootElasticIndex . $locale;
             $shards = 3;
             $replicas = 1;
@@ -139,8 +157,20 @@ trait ElasticSearchUtils {
             $mappingName = 'adverts';
             $documents = Advert::where('documentIndex', $index);
 
-            $response = ElasticSearchUtils::reIndex($index, $shards, $replicas, $analyser, $mappingName, $documents);
+            $response = self::reIndex($index, $shards, $replicas, $analyser, $mappingName, $documents);
             if($response !== true) {
+                return response($response->getContent(), $response->getStatusCode());
+            }
+
+            //Recreate Score3Index
+            $index = Score3::rootElasticIndex . $locale;
+            $shards = 1;
+            $replicas = 0;
+            $analyser = $locale;
+            $mappingName = 'score3s';
+
+            $response = self::reCreateIndex($index, $shards, $replicas, $analyser, $mappingName);
+            if($response->getStatusCode() !== 200) {
                 return response($response->getContent(), $response->getStatusCode());
             }
         }

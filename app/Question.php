@@ -15,9 +15,10 @@ class Question extends Model
      * 0: radio choice
      * 1: checkbox choice
      * 2: ordered list
+     * 3: open question
      *
      */
-    const TYPES = [0,1,2];
+    const TYPES = [0,1,2,3];
 
     /**
      * Library Type
@@ -82,6 +83,11 @@ class Question extends Model
                 foreach ($form->options as $option){
                     unset ($option->rank);
                 }
+                break;
+            case 3:
+                $form = $this->datas;
+                unset ($form->wantedTerms);
+                unset ($form->unwantedTerms);
                 break;
             default:
                 return null;
@@ -176,6 +182,32 @@ class Question extends Model
                     }
                 }
                 break;
+            case 3:
+                $keys = ['label', 'wantedTerms', 'unwantedTerms'];
+                foreach ($keys as $key) {
+                    if (!key_exists($key, $question['datas'])) {
+                        return false;
+                    }
+                }
+
+                if (!is_array($question['datas']['wantedTerms'])
+                    || !is_array($question['datas']['unwantedTerms'])
+                    || (count($question['datas']['wantedTerms']) + count($question['datas']['unwantedTerms'])) < 1) {
+                    return false;
+                }
+
+                foreach ($question['datas']['wantedTerms'] as $wantedTerm) {
+                    if (!key_exists('label', $wantedTerm)) {
+                        return false;
+                    }
+                }
+
+                foreach ($question['datas']['unwantedTerms'] as $unwantedTerm) {
+                    if (!key_exists('label', $unwantedTerm)) {
+                        return false;
+                    }
+                }
+                break;
         }
 
         return true;
@@ -205,6 +237,20 @@ class Question extends Model
                         ['label' => trans('blueprint.type0.option1'), 'rank' => [0]],
                         ['label' => trans('blueprint.type0.option2'), 'rank' => [1]],
                         ['label' => trans('blueprint.type0.option3'), 'rank' => [2]]
+                    ]
+                ];
+                break;
+            case 3:
+                $bluePrint->type = $type;
+                $bluePrint->datas = [
+                    'label' => trans('blueprint.type3.label'),
+                    'wantedTerms' => [
+                        ['label' => trans('blueprint.type3.wantedTerm1')],
+                        ['label' => trans('blueprint.type3.wantedTerm2')]
+                    ],
+                    'unwantedTerms' => [
+                        ['label' => trans('blueprint.type3.unwantedTerm1')],
+                        ['label' => trans('blueprint.type3.unwantedTerm2')]
                     ]
                 ];
                 break;
@@ -251,6 +297,12 @@ class Question extends Model
                         ['label' => trans('blueprint.type2.example.option7'), 'rank' => [6]],
                         ['label' => trans('blueprint.type2.example.option8'), 'rank' => [7]]
                     ]
+                ];
+                break;
+            case 3:
+                $example->type = $type;
+                $example->datas = [
+                    'label' => trans('blueprint.type3.example.label'),
                 ];
                 break;
         }

@@ -33,5 +33,19 @@
         {"label": "La curiosité", "rank": [3]}
       ]
     }
+  },
+  {
+    "type": 3,
+    "datas": {
+      "label": "Quelles sont les acteurs/actrices que vous aimez le mieux?",
+      "wantedTerms": [
+        {"label": "Robert de Niro"},
+        {"label": "Tom Hanks"}
+      ],
+      "unwantedTerms": [
+        {"label": "Chuck Norris"},
+        {"label": "Steven Seagal"}
+      ]
+    }
   }
 ]

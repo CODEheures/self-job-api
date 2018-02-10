@@ -21,7 +21,6 @@ return [
             'option1' => 'Etre à l\'écoute de mes demandes',
             'option2' => 'Me laisser un maximum d\'autonomie',
             'option3' => 'Être ferme avec les clients',
-            'option3' => 'Être ferme avec les clients',
             'option4' => 'Être souple avec les clients'
         ]
     ],
@@ -37,6 +36,17 @@ return [
             'option6' => 'Le courage',
             'option7' => 'La curiosité',
             'option8' => 'La ténacité'
+        ]
+    ],
+
+    'type3' => [
+        'label' => 'Votre Question ouverte...',
+        'wantedTerm1' => 'une expression clé attendue',
+        'wantedTerm2' => 'une autre expression clé attendue',
+        'unwantedTerm1' => 'une expression clé refusée',
+        'unwantedTerm2' => 'une autre expression clé refusée',
+        'example' => [
+            'label' => 'Quelles sont les acteurs/actrices que vous aimez le mieux?'
         ]
     ]
 

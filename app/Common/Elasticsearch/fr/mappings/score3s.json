@@ -1,0 +1,17 @@
+{
+  "properties": {
+    "id": {
+      "type": "long"
+    },
+    "description": {
+      "type": "text",
+      "analyzer": "french_light",
+      "fields": {
+        "stemmed": {
+          "type": "text",
+          "analyzer": "french_heavy"
+        }
+      }
+    }
+  }
+}

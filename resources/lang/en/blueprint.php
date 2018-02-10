@@ -37,6 +37,17 @@ return [
             'option7' => 'Curiosity',
             'option8' => 'Tenacity'
         ]
+    ],
+
+    'type3' => [
+        'label' => 'Your open question...',
+        'wantedTerm1' => 'an expected key phrase',
+        'wantedTerm2' => 'another key phrase expected',
+        'unwantedTerm1' => 'a key phrase refused',
+        'unwantedTerm2' => 'another key phrase refused',
+        'example' => [
+            'label' => 'Which actors / actresses do you like best?'
+        ]
     ]
 
 ];
