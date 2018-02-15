@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Auth;
 
+use App\Invitation;
 use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -26,16 +27,32 @@ class OAuthController extends Controller
         //Request Validation
         $this->validate($request, [
             'name' => 'required',
-            'email' => 'required|email|unique:users,email',
+            'email' => 'required|email|unique:users,email|exists:invitations,email',
             'password' => 'required|min:6|confirmed'
         ]);
 
+        // Invitation
+        $invitation = Invitation::where('email', $request->email)->first();
+        if(!$invitation) { return response()->json('No invitation', 422); }
+
+        // language
+        $colleague = User::where('company_id', $invitation->company_id)->first();
+
         //User Creation
-        User::create([
+        $newUser = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => bcrypt($request->password)
+            'password' => bcrypt($request->password),
+            'company_id' => $invitation->company_id
         ]);
+
+        if ($colleague) {
+            $newUser->pref_language = $colleague->pref_language;
+            $newUser->save();
+        }
+
+        // delete invitation
+        $invitation->delete();
 
         //Get Tokens and return this
         return $this->createResponse('password', $request);

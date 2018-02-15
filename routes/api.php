@@ -45,12 +45,16 @@ Route::middleware('throttle:60')->group(function () {
     Route::post('login', 'Api\Auth\OAuthController@login');
     Route::post('refresh', 'Api\Auth\OAuthController@refresh');
     Route::get('existUser', 'Api\UserController@exist');
+    Route::get('isInvitedAndFreeUser', 'Api\UserController@isInvitedAndFree');
     Route::middleware('auth:api')->group(function () {
 
         // GET, SET and LOGOUT user
         Route::get('user', 'Api\UserController@getUser');
         Route::post('user/set', 'Api\UserController@setProperty');
         Route::post('logout', 'Api\Auth\OAuthController@logout');
+
+        // Invite User
+        Route::post('invite', 'Api\UserController@invite');
 
         // Get list of user advert
         Route::get('myAdverts', 'Api\AdvertController@getMyAdverts')->name('getMyAdverts');

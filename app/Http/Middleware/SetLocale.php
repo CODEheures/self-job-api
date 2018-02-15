@@ -17,8 +17,9 @@ class SetLocale
     {
         if($request->filled('language') && in_array($request->langage, config('app.availableLocales')) ){
             App::setLocale($request->language);
+        } elseif (auth()->check() && in_array(auth()->user()->pref_language, config('app.availableLocales'))) {
+            App::setLocale(auth()->user()->pref_language);
         }
-
         return $next($request);
     }
 }

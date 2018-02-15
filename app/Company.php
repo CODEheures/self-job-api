@@ -44,6 +44,7 @@ class Company extends Model
 
     //Relations
     public function users() { return $this->hasMany(User::class); }
+    public function invitations() { return $this->hasMany(Invitation::class); }
     public function adverts() { return $this->hasMany(Advert::class); }
     public function questions() { return $this->hasMany(Question::class); }
 
