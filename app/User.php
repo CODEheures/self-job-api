@@ -48,4 +48,8 @@ class User extends Authenticatable
     public function company() { return $this->belongsTo(Company::class); }
     public function adverts() { return $this->hasMany(Advert::class); }
     public function questions() { return $this->hasMany(Question::class); }
+
+    public static function encodePassword($password) {
+        return bcrypt($password);
+    }
 }

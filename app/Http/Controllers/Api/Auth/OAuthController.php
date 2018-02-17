@@ -42,7 +42,7 @@ class OAuthController extends Controller
         $newUser = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => bcrypt($request->password),
+            'password' => User::encodePassword($request->password),
             'company_id' => $invitation->company_id
         ]);
 

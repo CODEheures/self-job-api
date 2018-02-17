@@ -4,10 +4,13 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Invitation;
+use App\Mail\ResetPasswordStepTwo;
+use App\Notifications\ResetPasswordStepOne;
 use App\Notifications\TeamInvitation;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
@@ -84,5 +87,53 @@ class UserController extends Controller
         }
 
 
+    }
+
+    public function resetPassword(Request $request) {
+        $this->validate($request, [
+            'email' => 'required|email|exists:users,email'
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if ($user) {
+            $token = hash('sha512', json_encode($user->email . strval($user->updated_at)));
+            DB::table('password_resets')->insert([
+                'email' => $user->email,
+                'token' => $token,
+            ]);
+
+            $user->notify(new ResetPasswordStepOne($token));
+            return response()->json('ok');
+        } else {
+            return response()->json('ko', 401);
+        }
+    }
+
+    public function confirmResetPassword($token) {
+        $passwordReset = DB::table('password_resets')->where('token', $token)->first();
+        if ($passwordReset) {
+
+            $user = User::where('email', $passwordReset->email)->first();
+
+            $newPassword = '';
+            for($i = 0; $i<10; $i++) {
+                $rand = mt_rand(33,122);
+                if (in_array($rand, array_merge(range(48,57), range(65,90), range(97,122)))){
+                    $newPassword .=  chr($rand);
+                } else {
+                    $i--;
+                }
+            }
+
+            $user->password = User::encodePassword($newPassword);
+            $user->save();
+
+            DB::table('password_resets')->where('email', $user->email)->delete();
+
+            return new ResetPasswordStepTwo($newPassword);
+        } else {
+            return response()->json('ko', 401);
+        }
     }
 }

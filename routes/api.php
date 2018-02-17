@@ -38,7 +38,9 @@ Route::middleware('throttle:60')->group(function () {
     // Show an advert
     Route::get('advert/{id}', 'Api\AdvertController@show');
 
-
+    // Ask for new Password
+    Route::post('resetPassword', 'Api\UserController@resetPassword');
+    Route::get('resetPassword/{token}', 'Api\UserController@confirmResetPassword')->name('confirmResetPassword');
 
     // Auth routes
     Route::post('register', 'Api\Auth\OAuthController@register');
