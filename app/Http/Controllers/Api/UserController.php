@@ -136,4 +136,15 @@ class UserController extends Controller
             return response()->json('ko', 401);
         }
     }
+
+    public function updatePassword(Request $request) {
+        $this->validate($request, [
+            'password' => 'required|min:6|confirmed'
+        ]);
+
+        Auth::user()->update(['password' => User::encodePassword($request->password)]);
+
+
+        return response()->json('ok', 200);
+    }
 }

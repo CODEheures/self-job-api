@@ -54,6 +54,7 @@ Route::middleware('throttle:60')->group(function () {
         Route::get('user', 'Api\UserController@getUser');
         Route::post('user/set', 'Api\UserController@setProperty');
         Route::post('logout', 'Api\Auth\OAuthController@logout');
+        Route::put('updatePassword', 'Api\UserController@updatePassword');
 
         // Invite User
         Route::post('invite', 'Api\UserController@invite');

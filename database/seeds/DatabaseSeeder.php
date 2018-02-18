@@ -51,7 +51,7 @@ class DatabaseSeeder extends Seeder
         $user1->email = 'test@mail.test';
         $user1->company_id = $company1->id;
         $user1->contact = 's.g@m.t';
-        $user1->password = bcrypt('password');
+        $user1->password = User::encodePassword('password');
         $user1->pref_language = 'fr';
         $user1->save();
 
@@ -60,7 +60,7 @@ class DatabaseSeeder extends Seeder
         $user2->email = 'test2@mail.test';
         $user2->company_id = $company2->id;
         $user2->contact = 's.g@m.t';
-        $user2->password = bcrypt('password2');
+        $user2->password = User::encodePassword('password2');
         $user2->pref_language = 'fr';
         $user2->save();
 
