@@ -147,4 +147,16 @@ class UserController extends Controller
 
         return response()->json('ok', 200);
     }
+
+    public function colleagues() {
+
+        $colleagues = User::where('company_id', auth()->user()->company_id)->where('id', '<>', auth()->user()->id)->get();
+
+        $results = [];
+        foreach ($colleagues as $colleague) {
+            $results[] = $colleague->only(['name', 'email', 'pictureUrl', 'can_manage_team']);
+        }
+
+        return response()->json($results);
+    }
 }

@@ -58,6 +58,7 @@ Route::middleware('throttle:60')->group(function () {
 
         // Invite User
         Route::post('invite', 'Api\UserController@invite');
+        Route::get('colleagues', 'Api\UserController@colleagues');
 
         // Get list of user advert
         Route::get('myAdverts', 'Api\AdvertController@getMyAdverts')->name('getMyAdverts');
