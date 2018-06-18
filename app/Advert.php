@@ -48,7 +48,8 @@ class Advert extends Model
     protected $casts = [
         'tags' => 'array',
         'requirements' => 'array',
-        'location' => 'object'
+        'location' => 'object',
+        'is_publish' => 'bool'
     ];
 
     private $mileage = 0;

@@ -32,37 +32,37 @@ class DatabaseSeeder extends Seeder
         \Illuminate\Support\Facades\App::setLocale('fr');
 
         //recreate Passport Grant Client
-        $client = new ClientRepository();
-        $client->createPasswordGrantClient(
-            null, 'selfjob', 'http://localhost'
-        );
+//        $client = new ClientRepository();
+//        $client->createPasswordGrantClient(
+//            null, 'selfjob', 'http://localhost'
+//        );
 
         //Populate DB
-        $company1 = new Company();
-        $company1->name = 'SARL lamba1';
-        $company1->save();
-
-        $company2 = new Company();
-        $company2->name = 'SAS alpha2';
-        $company2->save();
-
-        $user1 = new User();
-        $user1->name = 'sylvain';
-        $user1->email = 'test@mail.test';
-        $user1->company_id = $company1->id;
-        $user1->contact = 's.g@m.t';
-        $user1->password = User::encodePassword('password');
-        $user1->pref_language = 'fr';
-        $user1->save();
-
-        $user2 = new User();
-        $user2->name = 'sylvain2';
-        $user2->email = 'test2@mail.test';
-        $user2->company_id = $company2->id;
-        $user2->contact = 's.g@m.t';
-        $user2->password = User::encodePassword('password2');
-        $user2->pref_language = 'fr';
-        $user2->save();
+//        $company1 = new Company();
+//        $company1->name = 'SARL lamba1';
+//        $company1->save();
+//
+//        $company2 = new Company();
+//        $company2->name = 'SAS alpha2';
+//        $company2->save();
+//
+//        $user1 = new User();
+//        $user1->name = 'sylvain';
+//        $user1->email = 'test@mail.test';
+//        $user1->company_id = $company1->id;
+//        $user1->contact = 's.g@m.t';
+//        $user1->password = User::encodePassword('password');
+//        $user1->pref_language = 'fr';
+//        $user1->save();
+//
+//        $user2 = new User();
+//        $user2->name = 'sylvain2';
+//        $user2->email = 'test2@mail.test';
+//        $user2->company_id = $company2->id;
+//        $user2->contact = 's.g@m.t';
+//        $user2->password = User::encodePassword('password2');
+//        $user2->pref_language = 'fr';
+//        $user2->save();
 
 //        $advert1 = new Advert();
 //        $advert1->documentIndex = Advert::rootElasticIndex . 'fr';
