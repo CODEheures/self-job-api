@@ -1,12 +1,12 @@
 elasticsearch
 =================
+1/Install openJdk
+2/Install Elastic
+3/Config /etc/elasticseach/jvm.options pour limiter la memoire si besoin avec
+    -Xms256m
+    -Xmx256m
 
-// pour voir l'etat elasticsearch
-https://github.com/mobz/elasticsearch-head
-installation de l'extension chrome est le plus simple
-
-
-// ,icu pour analyse langue unicode
+4/ ,icu pour analyse langue unicode
 install:https://www.elastic.co/guide/en/elasticsearch/plugins/current/analysis-icu.html
 
 install analysis-icu:
@@ -14,6 +14,30 @@ go to /usr/share/elasticsearch/bin
 ./elasticsearch-plugin install analysis-icu
 https://www.elastic.co/guide/en/elasticsearch/plugins/current/analysis-icu.html
 
+5/Demarrer service elasticsearch start
+netstat -pln pour verifier l'etat de l'ecoute des ports
+
+// pour voir l'etat elasticsearch
+https://github.com/mobz/elasticsearch-head
+installation de l'extension chrome est le plus simple
+config nginx pour redirect vers localhost:9200
+server {
+    listen       80;
+    server_name  api.elastic.test;
+
+	location / {
+        proxy_pass "http://127.0.0.1:9200";
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $http_host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+
+
+// Lancer le seeder pour creer les index
+php artisan db:seed
 Create index manually with settings
 Run a mapping
 

@@ -15,8 +15,7 @@ return [
 
     'service' => [
         'domains' => [
-            env('PICS_MANAGER_STATIC1'),
-            env('PICS_MANAGER_STATIC2'),
+            env('PICS_MANAGER_STATIC1')
         ],
         'urls' => [
             'routeGetMd5' => '/private/getmd5',
