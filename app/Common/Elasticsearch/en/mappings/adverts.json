@@ -50,6 +50,16 @@
         }
       }
     },
+    "formatted_address": {
+      "type": "text",
+      "analyzer": "french_light",
+      "fields": {
+        "stemmed": {
+          "type": "text",
+          "analyzer": "french_heavy"
+        }
+      }
+    },
     "location": {
       "type": "geo_point"
     },

@@ -81,6 +81,7 @@ class Advert extends Model
             'requirements' => $this->requirements,
             'contract' => $this->contract,
             'location' => $this->location,
+            'formatted_address' => $this->formatted_address,
             'is_publish' => $this->is_publish,
             'created' => Carbon::parse($this->created_at)->toDateTimeString()
         ];
