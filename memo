@@ -15,6 +15,7 @@ go to /usr/share/elasticsearch/bin
 https://www.elastic.co/guide/en/elasticsearch/plugins/current/analysis-icu.html
 
 5/Demarrer service elasticsearch start
+--> enable at start : sudo systemctl enable elasticsearch.service
 netstat -pln pour verifier l'etat de l'ecoute des ports
 
 // pour voir l'etat elasticsearch

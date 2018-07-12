@@ -30,7 +30,8 @@ class TestController extends Controller
         // broadcast($newAdvertEvent);
 
         // Broadcast 11 answers to advert id 1
-        // $newAnswerEvent = new NewAnswerEvent(1, 6);
-        // broadcast($newAnswerEvent);
+         $newAnswerEvent = new NewAnswerEvent(1, 126);
+         broadcast($newAnswerEvent);
+         return response('ok');
     }
 }
