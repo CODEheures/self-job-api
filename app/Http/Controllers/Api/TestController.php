@@ -18,6 +18,10 @@ use Illuminate\Support\Facades\App;
 class TestController extends Controller
 {
     public function test() {
+        //test bd connection
+        // $user = User::first();
+        // dd($user);
+
         //return ElasticSearchUtils::reIndexAdverts();
 
         //$user = User::where('id', 1)->with('questions')->get();
@@ -30,8 +34,8 @@ class TestController extends Controller
         // broadcast($newAdvertEvent);
 
         // Broadcast 11 answers to advert id 1
-        // $newAnswerEvent = new NewAnswerEvent(1, 126);
-        // broadcast($newAnswerEvent);
-         return response('ok');
+         $newAnswerEvent = new NewAnswerEvent(1, 126);
+         broadcast($newAnswerEvent);
+         return response('oki');
     }
 }

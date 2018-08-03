@@ -1,5 +1,5 @@
 {
-	"authHost": "http://api.selfjob.test",
+	"authHost": "http://api",
 	"authEndpoint": "/broadcasting/auth",
 	"clients": [],
 	"database": "redis",
